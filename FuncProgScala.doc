@@ -1,2 +1,41 @@
-preface
+what is a side effect
+modify variable
+modifying a data structure in place
+setting field on an object
+throw exception or halt with an error
+print to console or read user input
+reading from or writing to a file
+drawing on the screen
+
+class Cafe {
+	def buyCoffee (cc: CreditCard) : Coffee = {
+		val cup = new Coffee()
+		cc.charge(cup.price)
+		cup
+		}
+}
+
+adding a payments object
+
+def buyCoffee (cc: CreditCard, p: Payments) : Coffee = {
+	val cup = new Coffee()
+	p.charge(cc, cup.price)
+	cup
+	}
+}
+
+payments can be an interface
+can be mocked
+basically sending a payment is a side effect
+
+return a charge object instead as a value
+all the side effects therefore are handled elsewhere
+
+def buyCoffee(cc: CreditCard) : (Coffee, Charge) = {
+	val cup = new Coffee()
+	(cup, Charge(cc, cup.price))
+	}
+}
+
+
 
