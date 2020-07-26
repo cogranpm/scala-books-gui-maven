@@ -1,6 +1,6 @@
 Project is maven based build of a scala swt/jface/eclipse stand alone application
 some 3rd party jars are not available, eg eclipse nebula
-so these need to be installed into local maven repository
+so these need to be installed into local maven repository, note use cmd and not powershell on windows
 examples below
 
 say the files are here:
