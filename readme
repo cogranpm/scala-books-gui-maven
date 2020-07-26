@@ -1,5 +1,13 @@
 Project is maven based build of a scala swt/jface/eclipse stand alone application
-some 3rd party jars are not available, eg eclipse nebula
+
+mvn compile
+mvn scala:run - a launcher is defined in the maven scala plugin in the POM
+
+Dependency Notes:
+platform dependent swt jar is handled in the pom with profile logic
+
+
+some 3rd party jars are not available in maven online, eg eclipse nebula
 so these need to be installed into local maven repository, note use cmd and not powershell on windows
 examples below
 
