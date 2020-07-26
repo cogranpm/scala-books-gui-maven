@@ -43,6 +43,7 @@ class MainWindow extends ApplicationWindow(null){
 
   var mainContainer: Composite = null
   var navReference:PShelfItem = null
+  var navFuncProg: PShelfItem = null
   var folder: CTabFolder = null
 
   override def createContents(parent: Composite): Control = {
@@ -68,9 +69,9 @@ class MainWindow extends ApplicationWindow(null){
     createReferenceButtons()
 
 
-    val navPlaceHolder = new PShelfItem(navShelf, SWT.NONE)
-    navPlaceHolder.setText("PlaceHolder")
-    navPlaceHolder.getBody.setLayout(new FillLayout(SWT.VERTICAL))
+    navFuncProg = new PShelfItem(navShelf, SWT.NONE)
+    navFuncProg.setText("Functional Programming in Scala")
+    navFuncProg.getBody.setLayout(new FillLayout(SWT.VERTICAL))
 
 
     folder = new CTabFolder(mainContainer, SWT.TOP | SWT.BORDER)
@@ -176,6 +177,11 @@ class MainWindow extends ApplicationWindow(null){
   }
 
 
+
+}
+
+
+object FuncProg{
 
 }
 

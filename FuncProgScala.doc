@@ -38,4 +38,20 @@ def buyCoffee(cc: CreditCard) : (Coffee, Charge) = {
 }
 
 
+To keep a function pure, instead of performing a side effect return some kind of definition of the side effect to be performed
+eg: an instance of a type with the needed information
+here is an example, note it is a value type (case class)
+
+case class Charge(cc: CreditCard, amount: Double) {
+ 
+ 	def combine(other: Charge) : Charge =
+ 		if (cc == other.cc)
+ 			Charge(cc, amount + other.amount)
+ 		else
+ 			throw new Exception("can't combine charges to different cards")
+}
+
+
+
+
 
