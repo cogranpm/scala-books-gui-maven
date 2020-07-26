@@ -1,0 +1,13 @@
+Project is maven based build of a scala swt/jface/eclipse stand alone application
+some 3rd party jars are not available, eg eclipse nebula
+so these need to be installed into local maven repository
+examples below
+
+say the files are here:
+E:/shared/Source/lib/java/eclipse-app/2019-06/nebula/org.eclipse.nebula.widgets.pshelf_1.1.0.201907151344.jar
+E:/shared/Source/lib/java/eclipse-app/2019-06/nebula/org.eclipse.nebula.widgets.pshelf.css_1.0.0.201907151344.jar
+
+command line to install to local repo:
+mvn install:install-file -Dfile="E:/shared/Source/lib/java/eclipse-app/2019-06/nebula/org.eclipse.nebula.widgets.pshelf_1.1.0.201907151344.jar" -DgroupId=org.eclipse.nebula -DartifactId=pshelf -Dversion=1.1.0.201907151344 -Dpackaging=jar
+
+mvn install:install-file -Dfile="E:/shared/Source/lib/java/eclipse-app/2019-06/nebula/org.eclipse.nebula.widgets.pshelf.css_1.0.0.201907151344.jar" -DgroupId=org.eclipse.nebula -DartifactId=pshelf_css -Dversion=1.1.0.201907151344 -Dpackaging=jar
