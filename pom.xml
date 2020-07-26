@@ -294,6 +294,13 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>KernaiApp</mainClass>
+            </manifest>
+          </archive>
+
         </configuration>
         <executions>
           <execution>
