@@ -214,28 +214,28 @@ object FuncProg{
 object BrowserTest {
 
   import org.eclipse.swt.browser.{Browser, ProgressEvent, ProgressListener}
-
+  val newOne = "https://prekitt.lwtears.com/books/TGPKGSS1/2021/2"
 
   def create(parent: Composite) : Composite = {
     val composite = new Composite(parent, SWT.NONE)
     val buttonBar = new Composite(composite, SWT.NONE)
     val buttonLoad = new Button(buttonBar, SWT.PUSH)
     buttonLoad.setText("Load")
+
+    val buttonRun = new Button(buttonBar, SWT.PUSH)
+    buttonRun.setText("Run")
+    buttonRun.setEnabled(false)
+
+
     val browser = new Browser(composite, SWT.NONE)
     browser.setJavascriptEnabled(true)
-    browser.setUrl("https://www.lwtears.com/mylwt")
-    //browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
+    //browser.setUrl("https://www.lwtears.com/mylwt")
+    browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
 
     browser.addProgressListener(new ProgressListener() {
       override def completed(event: ProgressEvent): Unit = {
         println("completed")
-        val script =
-          """
-            | let item = document.querySelector('canvas');
-            | item.style.backgroundColor = 'green';
-            |alert('hello guys');""".stripMargin
-        browser.execute(script)
-
+        buttonRun.setEnabled(true)
       }
 
       override def changed(event: ProgressEvent): Unit = println("changed")
@@ -246,6 +246,30 @@ object BrowserTest {
     composite.setLayout(new GridLayout(1, false))
     GridDataFactory.fillDefaults.grab(true, false).applyTo(buttonBar)
     GridDataFactory.fillDefaults.grab(true, true).applyTo(browser)
+
+    buttonLoad.addSelectionListener(widgetSelectedAdapter(
+      (e: SelectionEvent) =>
+      {
+        buttonRun.setEnabled(false)
+        browser.setUrl(newOne)
+      }))
+
+    buttonRun.addSelectionListener(widgetSelectedAdapter(
+      (e: SelectionEvent) =>
+        {
+          val script =
+            """ function getData() {
+              | let item = document.querySelectorAll('canvas');
+              | return item[0].toDataURL();
+              | }
+              |
+              | //item.style.backgroundColor = 'green';
+              | return getData();""".stripMargin
+           val result = browser.evaluate(script)
+          println(result)
+        }
+    ))
+
     composite
   }
 }
