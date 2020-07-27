@@ -16,6 +16,7 @@ import org.eclipse.swt.events.SelectionListener._
 import org.eclipse.swt.graphics.Image
 import org.eclipse.swt.graphics.Point
 import org.eclipse.swt.layout.{FillLayout, GridData, GridLayout, RowLayout}
+import org.eclipse.jface.layout.GridDataFactory
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Display
@@ -217,15 +218,18 @@ object BrowserTest {
 
   def create(parent: Composite) : Composite = {
     val composite = new Composite(parent, SWT.NONE)
+    val buttonBar = new Composite(parent, SWT.NONE)
+    val buttonLoad = new Button(buttonBar, SWT.PUSH)
+    buttonLoad.setText("Load")
     val browser = new Browser(composite, SWT.NONE)
-    browser.setUrl("https://fivesecondtest.com/")
+    browser.setUrl("https://www.lwtears.com/mylwt")
 
     browser.addProgressListener(new ProgressListener() {
       override def completed(event: ProgressEvent): Unit = {
         println("completed")
         val script =
           """
-            | let item = document.querySelector('.pagesection');
+            | let item = document.querySelector('canvas');
             | item.style.backgroundColor = 'green';
             |alert('hello guys');""".stripMargin
         browser.execute(script)
@@ -235,7 +239,11 @@ object BrowserTest {
       override def changed(event: ProgressEvent): Unit = println("changed")
 
     })
-    composite.setLayout(new FillLayout())
+
+    buttonBar.setLayout(new RowLayout())
+    composite.setLayout(new GridLayout(1, false))
+    GridDataFactory.fillDefaults.grab(true, false).applyTo(buttonBar)
+    GridDataFactory.fillDefaults.grab(true, true).applyTo(browser)
     composite
   }
 }
