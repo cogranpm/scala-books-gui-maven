@@ -218,11 +218,13 @@ object BrowserTest {
 
   def create(parent: Composite) : Composite = {
     val composite = new Composite(parent, SWT.NONE)
-    val buttonBar = new Composite(parent, SWT.NONE)
+    val buttonBar = new Composite(composite, SWT.NONE)
     val buttonLoad = new Button(buttonBar, SWT.PUSH)
     buttonLoad.setText("Load")
     val browser = new Browser(composite, SWT.NONE)
+    browser.setJavascriptEnabled(true)
     browser.setUrl("https://www.lwtears.com/mylwt")
+    //browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
 
     browser.addProgressListener(new ProgressListener() {
       override def completed(event: ProgressEvent): Unit = {
