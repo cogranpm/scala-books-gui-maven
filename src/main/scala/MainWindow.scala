@@ -33,6 +33,7 @@ import DbFunctions._
 import DBTests._
 import com.parinherm.model.{Chapter2Document, ReferenceDoc, ScalableLanguageDocument, FuncProgScala}
 import com.parinherm.ui.ReferenceDocView
+import java.util.Base64
 
 
 
@@ -260,13 +261,15 @@ object BrowserTest {
           val script =
             """ function getData() {
               | let item = document.querySelectorAll('canvas');
-              | return item[0].toDataURL();
+              | return item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
               | }
               |
               | //item.style.backgroundColor = 'green';
               | return getData();""".stripMargin
-           val result = browser.evaluate(script)
+           val result = browser.evaluate(script).toString()
           println(result)
+          val imageData = Base64.getDecoder.decode(result)
+
         }
     ))
 
