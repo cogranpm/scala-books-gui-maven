@@ -17,7 +17,7 @@ object DbFunctions {
   val url = "jdbc:postgresql://kronmintdesktop:5432/golangtest"
   val password = "reddingo"
   val driver = "org.postgresql.Driver"
-  println ("initialize database functions")
+
   val connection: Connection = DriverManager.getConnection(url, user, password)
   implicit val con: java.sql.Connection = connection
   val parser: RowParser[Book] = Macro.namedParser[Book]

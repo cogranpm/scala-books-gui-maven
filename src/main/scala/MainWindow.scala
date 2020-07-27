@@ -138,12 +138,28 @@ class MainWindow extends ApplicationWindow(null){
     referenceDoc.run()
   }
 
+  def addTab(name: String, view: Composite): Unit = {
+    val tabItem = new CTabItem(folder, SWT.NONE)
+    tabItem.setText(name)
+    tabItem.setControl(view)
+    mainContainer.layout()
+    folder.setSelection(tabItem)
+  }
+
   def createReferenceButtons(): Unit =
   {
-    //this is a database test
-    DbFunctions.runQuery()
-    //DbFunctions.insertBook("Neophytes guide to scala")
-    DbFunctions.close()
+    try {
+      //this is a database test
+      //DbFunctions.runQuery()
+      //DbFunctions.insertBook("Neophytes guide to scala")
+      //DbFunctions.close()
+
+    } catch  {
+      case ex: Exception => {
+        println("error")
+      }
+
+    }
 
     val chapter1Desc = "Chapter 1"
     val handler: SelectionListener = widgetSelectedAdapter(
@@ -174,7 +190,16 @@ class MainWindow extends ApplicationWindow(null){
       })
     addReferenceButton(funcScalaDesc, funcScala)
 
-  }
+    val browserDesc = "Browser Test"
+    val browserHandler = widgetSelectedAdapter(
+      (e: SelectionEvent) =>
+        {
+          val browserView = BrowserTest.create(folder)
+          addTab("Browser", browserView)
+        }
+    )
+    addReferenceButton(browserDesc, browserHandler)
+}
 
 
 
@@ -183,6 +208,36 @@ class MainWindow extends ApplicationWindow(null){
 
 object FuncProg{
 
+}
+
+object BrowserTest {
+
+  import org.eclipse.swt.browser.{Browser, ProgressEvent, ProgressListener}
+
+
+  def create(parent: Composite) : Composite = {
+    val composite = new Composite(parent, SWT.NONE)
+    val browser = new Browser(composite, SWT.NONE)
+    browser.setUrl("https://fivesecondtest.com/")
+
+    browser.addProgressListener(new ProgressListener() {
+      override def completed(event: ProgressEvent): Unit = {
+        println("completed")
+        val script =
+          """
+            | let item = document.querySelector('.pagesection');
+            | item.style.backgroundColor = 'green';
+            |alert('hello guys');""".stripMargin
+        browser.execute(script)
+
+      }
+
+      override def changed(event: ProgressEvent): Unit = println("changed")
+
+    })
+    composite.setLayout(new FillLayout())
+    composite
+  }
 }
 
 
