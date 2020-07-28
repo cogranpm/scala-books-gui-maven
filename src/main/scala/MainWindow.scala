@@ -268,7 +268,8 @@ object BrowserTest {
               | return getData();""".stripMargin
            val result = browser.evaluate(script).toString()
           println(result)
-          val imageData = Base64.getDecoder.decode(result)
+          // must remove the header bit first
+          //val imageData = Base64.getDecoder.decode(result)
 
         }
     ))

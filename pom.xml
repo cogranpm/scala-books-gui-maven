@@ -29,6 +29,18 @@
     </profile>
 
     <profile>
+      <id>Mac</id>
+      <activation>
+        <os>
+          <name>Mac OS X</name>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties><artifact-id-swt>org.eclipse.swt.cocoa.macosx.x86_64</artifact-id-swt></properties>
+    </profile>
+
+
+    <profile>
       <id>windows-10</id>
       <activation>
         <os>
@@ -292,12 +304,11 @@
               <args>
                 <arg>arg1</arg>
               </args>
-              <!-- jvmArgs are optional
               <jvmArgs>
                 <jvmArg>-Xmx128m</jvmArg>
-                <jvmArg>-Djava.library.path=...</jvmArg>
+                <jvmArg>-XstartOnFirstThread</jvmArg>
               </jvmArgs>
-              -->
+
             </launcher>
             <!-- you could define other launcher -->
           </launchers>
