@@ -1,4 +1,5 @@
 import scala._
+import scala.Array
 import org.eclipse.core.databinding.observable.Realm
 import org.eclipse.jface.action.Action
 import org.eclipse.jface.action.ActionContributionItem
@@ -34,6 +35,9 @@ import DBTests._
 import com.parinherm.model.{Chapter2Document, ReferenceDoc, ScalableLanguageDocument, FuncProgScala}
 import com.parinherm.ui.ReferenceDocView
 import java.util.Base64
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Path, Paths, Files}
 
 
 
@@ -216,6 +220,42 @@ object BrowserTest {
 
   import org.eclipse.swt.browser.{Browser, ProgressEvent, ProgressListener}
   val newOne = "https://prekitt.lwtears.com/books/TGPKGSS1/2021/2"
+  var browser: Browser = null
+  var iteration: Int = 0
+
+  def processImages(iteration: Int): Unit = {
+    val script =
+      """ function getData() {
+        | let items = document.querySelectorAll('canvas');
+        | let finishedItems = [];
+        | //let data = item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+        | for (let i = 0; i < items.length; i++) {
+        |   let item = items[i];
+        |   let itemData = item.toDataURL('image/png');
+        |   let strippedItemData = itemData.replace(/^data:image\/(png|jpg);base64,/, "");
+        |   finishedItems.push(strippedItemData);
+        | }
+        | return finishedItems;
+        | //let data = item[0].toDataURL('image/png');
+        | //let  output= data.replace(/^data:image\/(png|jpg);base64,/, "");
+        | //return output;
+        | }
+        |
+        | return getData();""".stripMargin
+    val result: Array[Object] = browser.evaluate(script).asInstanceOf[Array[Object]]
+    var index = 0
+    for (item <- result){
+      index += 1
+      val imageData = Base64.getDecoder.decode(item.toString)
+      val imagePath: Path = Paths.get(s"lwt-teachers/sample${iteration}_${index}.png")
+      try{
+        Files.write(imagePath,  imageData)
+      } catch {
+        case e: IOException => println(e.getMessage)
+      }
+
+    }
+  }
 
   def create(parent: Composite) : Composite = {
     val composite = new Composite(parent, SWT.NONE)
@@ -228,7 +268,7 @@ object BrowserTest {
     buttonRun.setEnabled(false)
 
 
-    val browser = new Browser(composite, SWT.NONE)
+    browser = new Browser(composite, SWT.NONE)
     browser.setJavascriptEnabled(true)
     //browser.setUrl("https://www.lwtears.com/mylwt")
     browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
@@ -258,22 +298,7 @@ object BrowserTest {
     buttonRun.addSelectionListener(widgetSelectedAdapter(
       (e: SelectionEvent) =>
         {
-          val script =
-            """ function getData() {
-              | let item = document.querySelectorAll('canvas');
-              | //let data = item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
-              | let data = item[0].toDataURL('image/png');
-              | let  output= data.replace(/^data:image\/(png|jpg);base64,/, "");
-              | return output;
-              | }
-              |
-              | //item.style.backgroundColor = 'green';
-              | return getData();""".stripMargin
-           val result = browser.evaluate(script).toString()
-          println(result)
-          // must remove the header bit first
-          val imageData = Base64.getDecoder.decode(result)
-
+          processImages(iteration)
         }
     ))
 
