@@ -22,3 +22,7 @@ mvn install:install-file -Dfile="E:/shared/Source/lib/java/eclipse-app/2019-06/n
 
 mvn install:install-file -Dfile="E:/shared/Source/lib/java/eclipse-app/2019-06/nebula/org.eclipse.nebula.widgets.pshelf.css_1.0.0.201907151344.jar" -DgroupId=org.eclipse.nebula -DartifactId=pshelf_css -Dversion=1.1.0.201907151344 -Dpackaging=jar
 
+
+
+mvn install:install-file -Dfile="C:\Tools\lib\java\swt-jface\swt.jar" -DgroupId=org.eclipse.local -DartifactId=swt -Dversion=4.3 -Dpackaging=jar
+
