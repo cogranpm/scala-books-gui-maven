@@ -261,7 +261,10 @@ object BrowserTest {
           val script =
             """ function getData() {
               | let item = document.querySelectorAll('canvas');
-              | return item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+              | //let data = item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+              | let data = item[0].toDataURL('image/png');
+              | let  output= data.replace(/^data:image\/(png|jpg);base64,/, "");
+              | return output;
               | }
               |
               | //item.style.backgroundColor = 'green';
@@ -269,7 +272,7 @@ object BrowserTest {
            val result = browser.evaluate(script).toString()
           println(result)
           // must remove the header bit first
-          //val imageData = Base64.getDecoder.decode(result)
+          val imageData = Base64.getDecoder.decode(result)
 
         }
     ))
