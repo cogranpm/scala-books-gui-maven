@@ -219,11 +219,15 @@ object FuncProg{
 object BrowserTest {
 
   import org.eclipse.swt.browser.{Browser, ProgressEvent, ProgressListener}
-  val newOne = "https://prekitt.lwtears.com/books/TGPKGSS1/2021/2"
+  //val newOne = "https://prekitt.lwtears.com/books/TGPKGSS1/2021/2"
   var browser: Browser = null
-  var iteration: Int = 0
+  var txtUrl: Text = null
+  var buttonNext: Button = null
+  var buttonRun: Button = null
+  var iteration: Int = 2
+  val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS1/2021"
 
-  def processImages(iteration: Int): Unit = {
+  def processImages(current_iteration: Int): Unit = {
     val script =
       """ function getData() {
         | let items = document.querySelectorAll('canvas');
@@ -245,14 +249,16 @@ object BrowserTest {
     val result: Array[Object] = browser.evaluate(script).asInstanceOf[Array[Object]]
     var index = 0
     for (item <- result){
-      index += 1
       val imageData = Base64.getDecoder.decode(item.toString)
-      val imagePath: Path = Paths.get(s"lwt-teachers/sample${iteration}_${index}.png")
+      val pageNo = index + current_iteration
+      val imagePath: Path = Paths.get(s"lwt-teachers/page_${pageNo}.png")
       try{
         Files.write(imagePath,  imageData)
       } catch {
         case e: IOException => println(e.getMessage)
       }
+      index += 1
+
 
     }
   }
@@ -263,19 +269,25 @@ object BrowserTest {
     val buttonLoad = new Button(buttonBar, SWT.PUSH)
     buttonLoad.setText("Load")
 
-    val buttonRun = new Button(buttonBar, SWT.PUSH)
+    txtUrl = new Text(buttonBar, SWT.SINGLE)
+    txtUrl.setText(baseURL)
+
+    buttonRun = new Button(buttonBar, SWT.PUSH)
     buttonRun.setText("Run")
+    buttonRun.setEnabled(false)
+
+    buttonNext = new Button(buttonBar, SWT.PUSH)
+    buttonNext.setText("Next")
     buttonRun.setEnabled(false)
 
 
     browser = new Browser(composite, SWT.NONE)
     browser.setJavascriptEnabled(true)
     //browser.setUrl("https://www.lwtears.com/mylwt")
-    browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
+    //browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
 
     browser.addProgressListener(new ProgressListener() {
       override def completed(event: ProgressEvent): Unit = {
-        println("completed")
         buttonRun.setEnabled(true)
       }
 
@@ -291,14 +303,29 @@ object BrowserTest {
     buttonLoad.addSelectionListener(widgetSelectedAdapter(
       (e: SelectionEvent) =>
       {
-        buttonRun.setEnabled(false)
-        browser.setUrl(newOne)
+        println(s"about to load ${txtUrl.getText()}")
+        browser.setUrl(txtUrl.getText())
       }))
+
+    buttonNext.addSelectionListener(widgetSelectedAdapter(
+      (e: SelectionEvent) =>
+      {
+        txtUrl.setText(s"${baseURL}/${iteration}")
+        println(s"about to load ${txtUrl.getText()}")
+        browser.setUrl(txtUrl.getText())
+      }))
+
 
     buttonRun.addSelectionListener(widgetSelectedAdapter(
       (e: SelectionEvent) =>
         {
+          buttonRun.setEnabled(false)
           processImages(iteration)
+          iteration += 2
+          //load up next page
+          txtUrl.setText(s"${baseURL}/${iteration}")
+          println(s"about to load ${txtUrl.getText()}")
+          browser.setUrl(txtUrl.getText())
         }
     ))
 
