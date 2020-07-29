@@ -224,8 +224,13 @@ object BrowserTest {
   var txtUrl: Text = null
   var buttonNext: Button = null
   var buttonRun: Button = null
-  var iteration: Int = 2
-  val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS1/2021"
+  var iteration: Int = 0
+  var folderName: String = "lwt-teacherw"
+  //val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS1/2021"
+  //val baseURL = "https://prekitt.lwtears.com/books/MFSB/2021"
+  //val baseURL = "https://prekitt.lwtears.com/books/MFLB/2021"
+  //val baseURL = "https://prekitt.lwtears.com/books/IKMN/2021"
+  val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS/2021"
 
   def processImages(current_iteration: Int): Unit = {
     val script =
@@ -251,7 +256,7 @@ object BrowserTest {
     for (item <- result){
       val imageData = Base64.getDecoder.decode(item.toString)
       val pageNo = index + current_iteration
-      val imagePath: Path = Paths.get(s"lwt-teachers/page_${pageNo}.png")
+      val imagePath: Path = Paths.get(s"${folderName}/page_${pageNo}.png")
       try{
         Files.write(imagePath,  imageData)
       } catch {
@@ -273,7 +278,7 @@ object BrowserTest {
     txtUrl.setText(baseURL)
 
     buttonRun = new Button(buttonBar, SWT.PUSH)
-    buttonRun.setText("Run")
+    buttonRun.setText("&Run")
     buttonRun.setEnabled(false)
 
     buttonNext = new Button(buttonBar, SWT.PUSH)
