@@ -41,6 +41,7 @@ import java.nio.file.{Path, Paths, Files}
 
 
 
+
 class MainWindow extends ApplicationWindow(null){
 
   addToolBar(SWT.FLAT | SWT.WRAP)
@@ -72,13 +73,12 @@ class MainWindow extends ApplicationWindow(null){
 
     navReference.setText("Reference")
     navReference.getBody.setLayout(new RowLayout(SWT.VERTICAL))
-    createReferenceButtons()
-
 
     navFuncProg = new PShelfItem(navShelf, SWT.NONE)
     navFuncProg.setText("Functional Programming in Scala")
-    navFuncProg.getBody.setLayout(new FillLayout(SWT.VERTICAL))
+    navFuncProg.getBody.setLayout(new RowLayout(SWT.VERTICAL))
 
+    createReferenceButtons()
 
     folder = new CTabFolder(mainContainer, SWT.TOP | SWT.BORDER)
     val item = new CTabItem(folder, SWT.NONE)
@@ -128,8 +128,8 @@ class MainWindow extends ApplicationWindow(null){
 
   override def getInitialSize: Point = new Point(900, 900)
 
-  def addReferenceButton(name: String, handler: SelectionListener): Unit = {
-    val btnChapter1: Button = new Button(navReference.getBody, SWT.PUSH)
+  def addReferenceButton(shelfItem: PShelfItem, name: String, handler: SelectionListener): Unit = {
+    val btnChapter1: Button = new Button(shelfItem.getBody, SWT.PUSH)
     btnChapter1.setText(name)
     btnChapter1.addSelectionListener(handler)
   }
@@ -175,7 +175,7 @@ class MainWindow extends ApplicationWindow(null){
         addReferenceTab(chapter1Desc, scalableLanguageDocument)
       })
 
-    addReferenceButton(chapter1Desc, handler)
+    addReferenceButton(navReference, chapter1Desc, handler)
 
     val chapter2Desc = "Chapter 2"
     val chapter2Handler = widgetSelectedAdapter (
@@ -184,7 +184,7 @@ class MainWindow extends ApplicationWindow(null){
         val chap2Doc = new Chapter2Document("Chapter2.doc")
         addReferenceTab(chapter2Desc, chap2Doc)
       })
-    addReferenceButton(chapter2Desc, chapter2Handler)
+    addReferenceButton(navReference, chapter2Desc, chapter2Handler)
 
 
     val funcScalaDesc = "Functional Prog with Scala"
@@ -194,7 +194,7 @@ class MainWindow extends ApplicationWindow(null){
         val funcScalaDoc = new FuncProgScala("FuncProgScala.doc")
         addReferenceTab(funcScalaDesc, funcScalaDoc)
       })
-    addReferenceButton(funcScalaDesc, funcScala)
+    addReferenceButton(navFuncProg, funcScalaDesc, funcScala)
 
     val browserDesc = "Browser Test"
     val browserHandler = widgetSelectedAdapter(
@@ -204,7 +204,7 @@ class MainWindow extends ApplicationWindow(null){
           addTab("Browser", browserView)
         }
     )
-    addReferenceButton(browserDesc, browserHandler)
+    addReferenceButton(navReference, browserDesc, browserHandler)
 }
 
 
