@@ -225,12 +225,13 @@ object BrowserTest {
   var buttonNext: Button = null
   var buttonRun: Button = null
   var iteration: Int = 0
-  var folderName: String = "lwt-teacherw"
+  var folderName: String = "lwt-mybook"
   //val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS1/2021"
   //val baseURL = "https://prekitt.lwtears.com/books/MFSB/2021"
   //val baseURL = "https://prekitt.lwtears.com/books/MFLB/2021"
   //val baseURL = "https://prekitt.lwtears.com/books/IKMN/2021"
-  val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS/2021"
+  //val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS/2021"
+  val baseURL = "https://prekitt.lwtears.com/books/MB/2021"
 
   def processImages(current_iteration: Int): Unit = {
     val script =
