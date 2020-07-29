@@ -234,6 +234,15 @@ object BrowserTest {
   val baseURL = "https://prekitt.lwtears.com/books/MB/2021"
 
   def processImages(current_iteration: Int): Unit = {
+    /* runs a script within the browser page that is loaded in the browser control
+    script will locate call canvas elements - which contain an image
+    and will use the toDataURL method to get the binary data of the image within
+    strip out the header text then return then in an array to the scala client code
+    hosting the browser control
+
+    the scala code will decode the data and save to a file
+    using an index notation for the file names
+    */
     val script =
       """ function getData() {
         | let items = document.querySelectorAll('canvas');
@@ -246,9 +255,6 @@ object BrowserTest {
         |   finishedItems.push(strippedItemData);
         | }
         | return finishedItems;
-        | //let data = item[0].toDataURL('image/png');
-        | //let  output= data.replace(/^data:image\/(png|jpg);base64,/, "");
-        | //return output;
         | }
         |
         | return getData();""".stripMargin
@@ -321,7 +327,7 @@ object BrowserTest {
         browser.setUrl(txtUrl.getText())
       }))
 
-
+    // run button will process images in current page then load the next page
     buttonRun.addSelectionListener(widgetSelectedAdapter(
       (e: SelectionEvent) =>
         {
