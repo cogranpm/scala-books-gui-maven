@@ -33,7 +33,7 @@ import org.eclipse.nebula.widgets.pshelf._
 import DbFunctions._
 import DBTests._
 import com.parinherm.model.{Chapter2Document, ReferenceDoc, ScalableLanguageDocument, FuncProgScala}
-import com.parinherm.ui.ReferenceDocView
+import com.parinherm.ui.{ReferenceDocView,  FuncProgView}
 import java.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -78,13 +78,13 @@ class MainWindow extends ApplicationWindow(null){
     navFuncProg.setText("Functional Programming in Scala")
     navFuncProg.getBody.setLayout(new RowLayout(SWT.VERTICAL))
 
-    createReferenceButtons()
-
     folder = new CTabFolder(mainContainer, SWT.TOP | SWT.BORDER)
     val item = new CTabItem(folder, SWT.NONE)
     item.setText("&Getting Started")
     val masterPropertyTabItem = new CTabItem(folder, SWT.NONE)
     masterPropertyTabItem.setText("&Master Properties")
+
+    createReferenceButtons()
     container
   }
 
@@ -187,7 +187,7 @@ class MainWindow extends ApplicationWindow(null){
     addReferenceButton(navReference, chapter2Desc, chapter2Handler)
 
 
-    val funcScalaDesc = "Functional Prog with Scala"
+    val funcScalaDesc = "Summary"
     val funcScala = widgetSelectedAdapter (
       (e: SelectionEvent) =>
       {
@@ -195,6 +195,15 @@ class MainWindow extends ApplicationWindow(null){
         addReferenceTab(funcScalaDesc, funcScalaDoc)
       })
     addReferenceButton(navFuncProg, funcScalaDesc, funcScala)
+
+    val funcScalaExercisesDesc = "Exercises"
+    val funcScalaExercisesHandler = widgetSelectedAdapter (
+      (e: SelectionEvent) =>
+      {
+        val funcScalaExercisesView = FuncProgView.create(folder)
+        addTab(funcScalaExercisesDesc, funcScalaExercisesView)
+      })
+    addReferenceButton(navFuncProg, funcScalaExercisesDesc, funcScalaExercisesHandler)
 
     val browserDesc = "Browser Test"
     val browserHandler = widgetSelectedAdapter(
