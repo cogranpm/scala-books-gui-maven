@@ -1,7 +1,11 @@
 package com.parinherm.ui
 
+import java.util
+
+import org.eclipse.core.databinding.beans.IBeanValueProperty
 import org.eclipse.core.databinding.beans.typed.BeanProperties
 import org.eclipse.core.databinding.observable.list.WritableList
+import org.eclipse.core.databinding.property.value.IValueProperty
 import org.eclipse.jface.databinding.viewers.ViewerSupport
 import org.eclipse.jface.layout.GridDataFactory
 import org.eclipse.jface.viewers.{TableViewer, TableViewerColumn}
@@ -10,12 +14,31 @@ import org.eclipse.swt.custom.SashForm
 import org.eclipse.swt.layout.{FillLayout, GridLayout}
 import org.eclipse.swt.widgets.{Composite, Label}
 
+import scala.beans.BeanProperty
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-class Exercise (title: String)
+class Exercise (@BeanProperty var title: String)
+
+class Topic (@BeanProperty var title: String, @BeanProperty var help: String, @BeanProperty var exercises: ListBuffer[Exercise])
 
 object FuncProgView {
+
+  val fdsHelp =
+    """
+      | um, some functional data structures here
+      |""".stripMargin
+
+  val topics = ListBuffer.empty[Topic]
+  topics += new Topic("Functional Data Structures", fdsHelp,  ListBuffer.empty)
+  topics += new Topic("Handling Errors", fdsHelp,  ListBuffer.empty)
+  topics += new Topic("Strictness and Laziness", fdsHelp, ListBuffer.empty)
+
+  // there are many exercises per topic, associate via the topic key
+  val exercises = ListBuffer.empty[Exercise]
+  exercises += new Exercise("Functions")
+  exercises += new Exercise("Currying")
 
   def create(parent: Composite):  Composite ={
     val root = new Composite(parent, SWT.NONE)
@@ -34,17 +57,15 @@ object FuncProgView {
   def createListBox(parent: Composite) : Composite = {
     val listBox: Composite = new Composite(parent, SWT.NONE)
     listBox.setLayout(new FillLayout(SWT.VERTICAL))
-    val lblList = new Label(listBox, SWT.NONE).setText("List")
     val viewer = new TableViewer(listBox)
     val column = new TableViewerColumn(viewer, SWT.NONE)
     column.getColumn().setWidth(100)
     column.getColumn().setText("Title")
     viewer.getTable().setHeaderVisible(true)
-    val input: WritableList[Exercise] = WritableList.withElementType(classOf[Exercise])
-    //input.addAll(getExercisesData())
-    input.add(new Exercise("Trying"))
-    //val input = new WritableList[Exercise](getExercisesData(), classOf[Exercise])
-    //ViewerSupport.bind[Object](viewer, input, BeanProperties.values("Title"))
+    val input: WritableList[Topic] = WritableList.withElementType(classOf[Topic])
+    //input.add(new Exercise("Trying"))
+    input.addAll(getTopics())
+    ViewerSupport.bind(viewer, input, BeanProperties.value(classOf[Topic], "title"))
     listBox
   }
 
@@ -69,13 +90,20 @@ object FuncProgView {
     val labelHelpContent = new Label(dataBox, SWT.NONE)
     labelHelpContent.setText("Help Contents")
     GridDataFactory.swtDefaults().grab(true, true).applyTo(labelHelpContent)
+
+   //add a list of exercises right here
+   // use master detail model binding
+
     dataBox
   }
 
-  def getExercisesData(): ListBuffer[Exercise] ={
-    val exercises = ListBuffer.empty[Exercise]
-    exercises += new Exercise("Functions")
-    exercises
+  def getTopics(): util.Collection[Topic] = {
+    topics.asJavaCollection
+  }
+
+  def getExercisesData(): util.Collection[Exercise] = {
+
+    exercises.asJavaCollection
   }
 
 }
