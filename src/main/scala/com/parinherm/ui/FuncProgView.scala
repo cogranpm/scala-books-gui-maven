@@ -15,40 +15,17 @@ import org.eclipse.jface.layout.{GridDataFactory, GridLayoutFactory}
 import org.eclipse.jface.viewers.{TableViewer, TableViewerColumn}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.SashForm
+import org.eclipse.swt.graphics.Color
 import org.eclipse.swt.layout.{FillLayout, GridLayout}
-import org.eclipse.swt.widgets.{Composite, Label, Text}
+import org.eclipse.swt.widgets.{Composite, Control, Display, Label, Text}
 
 import scala.beans.BeanProperty
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
+import org.eclipse.core.databinding.UpdateValueStrategy
 
-class Exercise (@BeanProperty var title: String)
 
-class Topic (var title: String,
-             var help: String,
-             var exercises: ListBuffer[Exercise])
-extends Object with BoundPropertyBean{
-
-  def setTitle(newValue: String) = {
-    val oldValue = title
-    title = newValue
-    firePropertyChange("title", oldValue, newValue)
-  }
-
-  def getTitle(): String = title
-}
-
-object PCL
-  extends java.beans.PropertyChangeListener
-{
-  override def propertyChange(pce:java.beans.PropertyChangeEvent):Unit =
-  {
-    System.out.println("Bean changed its " + pce.getPropertyName() +
-      " from " + pce.getOldValue() +
-      " to " + pce.getNewValue())
-  }
-}
 
 trait BoundPropertyBean
 {
@@ -65,24 +42,88 @@ trait BoundPropertyBean
     pcs.firePropertyChange(new PropertyChangeEvent(this, name, oldVal, newVal))
 }
 
+class Exercise (@BeanProperty var title: String)
+
+// mucking about with databinding
+// this is readonly display, so no propertychange fire required on set
+// therefore use @BeanProperty to autogenerate default setters
+class Topic (@BeanProperty val title: String,
+             @BeanProperty val help: String,
+             @BeanProperty val exercises: ListBuffer[Exercise])
+extends Object with BoundPropertyBean
+/*{
+
+  def setTitle(newValue: String) = {
+    val oldValue = title
+    title = newValue
+    firePropertyChange("title", oldValue, newValue)
+  }
+
+  def getTitle(): String = title
+
+}
+
+object PCL
+  extends java.beans.PropertyChangeListener
+{
+  override def propertyChange(pce:java.beans.PropertyChangeEvent):Unit =
+  {
+    System.out.println("Bean changed its " + pce.getPropertyName() +
+      " from " + pce.getOldValue() +
+      " to " + pce.getNewValue())
+  }
+}
+*/
+
+
+
 object FuncProgView {
 
+
+  // creating some data in code here
+  // maybe move to database later
   val fdsHelp =
     """
       | um, some functional data structures here
       |""".stripMargin
 
-  val topics = ListBuffer.empty[Topic]
-  topics += new Topic("Functional Data Structures", fdsHelp,  ListBuffer.empty)
-  topics += new Topic("Handling Errors", fdsHelp,  ListBuffer.empty)
-  topics += new Topic("Strictness and Laziness", fdsHelp, ListBuffer.empty)
+  val functionsHelp =
+    """
+      |um, functions
+      |""".stripMargin
+
+  val curryHelp =
+    """
+      | um, currying
+      |""".stripMargin
 
   // there are many exercises per topic, associate via the topic key
   val exercises = ListBuffer.empty[Exercise]
   exercises += new Exercise("Functions")
   exercises += new Exercise("Currying")
 
+
+  val topics = ListBuffer.empty[Topic]
+  topics += new Topic("Functional Data Structures", fdsHelp, ListBuffer.empty)
+  topics += new Topic("Handling Errors", curryHelp,  ListBuffer.empty)
+  topics += new Topic("Strictness and Laziness", functionsHelp, ListBuffer.empty)
+
+
   var viewer: TableViewer = null
+
+  val dbc = new DataBindingContext()
+
+  def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY)
+
+  def createWidgetBinding(widget: Control, propertyName: String) = {
+    val target = WidgetProperties.text(SWT.Modify).observe(widget)
+    val selectedItem = ViewerProperties.singleSelection[TableViewer, Topic]().observe(viewer)
+    val detailValue = BeanProperties.value(propertyName).observeDetail(selectedItem)
+
+    val widgetToModel = new UpdateValueStrategy[String, Nothing](UpdateValueStrategy.POLICY_NEVER)
+    val modelToWidget = new UpdateValueStrategy[Nothing, String](UpdateValueStrategy.POLICY_UPDATE)
+    dbc.bindValue(target, detailValue, widgetToModel, modelToWidget)
+  }
 
   def create(parent: Composite):  Composite ={
     val root = new Composite(parent, SWT.NONE)
@@ -122,28 +163,29 @@ object FuncProgView {
       multiline label for code output
     */
     val dataBox: Composite = new Composite(parent, SWT.NONE)
+    //dataBox.setBackground(Display.getCurrent.getSystemColor(SWT.COLOR_BLUE))
     dataBox.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).create())
     val labelTitle = new Label(dataBox, SWT.NONE)
     labelTitle.setText("Title")
-    GridDataFactory.swtDefaults().grab(false, false).applyTo(labelTitle)
+    GridDataFactory.fillDefaults().grab(false, false).applyTo(labelTitle)
 
-    val textTitleContent = new Text(dataBox, SWT.BORDER | SWT.READ_ONLY)
-    GridDataFactory.swtDefaults().grab(true, false).applyTo(textTitleContent)
-    //val labelTitleContent = new Label(dataBox, SWT.NONE)
-    //labelTitleContent.setText("test")
-    //GridDataFactory.swtDefaults().grab(true, false).applyTo(labelTitleContent)
+    val textTitleContent = createReadOnlyLabel(dataBox)
+    GridDataFactory.fillDefaults().grab(true, false).applyTo(textTitleContent)
 
     val labelHelpTitle = new Label(dataBox, SWT.NONE)
     labelHelpTitle.setText("Help")
-    GridDataFactory.swtDefaults().grab(false, false).applyTo(labelHelpTitle)
-    val labelHelpContent = new Label(dataBox, SWT.NONE)
+    GridDataFactory.fillDefaults().grab(false, false).applyTo(labelHelpTitle)
+
+    val labelHelpContent = createReadOnlyLabel(dataBox)
     labelHelpContent.setText("Help Contents")
-    GridDataFactory.swtDefaults().grab(true, true).applyTo(labelHelpContent)
+    GridDataFactory.fillDefaults().grab(true, true).applyTo(labelHelpContent)
 
    //add a list of exercises right here
    // use master detail model binding
+    createWidgetBinding(textTitleContent, "title")
+    createWidgetBinding(labelHelpContent, "help")
 
-    val dbc = new DataBindingContext()
+    /*
     val target = WidgetProperties.text(SWT.Modify).observe(textTitleContent)
     val selectedItem = ViewerProperties.singleSelection[TableViewer, Topic]().observe(viewer)
     val detailValue = BeanProperties.value("title").observeDetail(selectedItem)
@@ -151,6 +193,8 @@ object FuncProgView {
     val widgetToModel = new UpdateValueStrategy[String, Nothing](UpdateValueStrategy.POLICY_NEVER)
     val modelToWidget = new UpdateValueStrategy[Nothing, String](UpdateValueStrategy.POLICY_UPDATE)
     dbc.bindValue(target, detailValue, widgetToModel, modelToWidget)
+
+     */
 
 
     dataBox
