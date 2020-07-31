@@ -12,7 +12,7 @@ import org.eclipse.jface.databinding.swt.typed.WidgetProperties
 import org.eclipse.jface.databinding.viewers.ViewerSupport
 import org.eclipse.jface.databinding.viewers.typed.ViewerProperties
 import org.eclipse.jface.layout.{GridDataFactory, GridLayoutFactory}
-import org.eclipse.jface.viewers.{TableViewer, TableViewerColumn}
+import org.eclipse.jface.viewers.{ListViewer, TableViewer, TableViewerColumn}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.SashForm
 import org.eclipse.swt.graphics.Color
@@ -104,7 +104,7 @@ object FuncProgView {
 
 
   val topics = ListBuffer.empty[Topic]
-  topics += new Topic("Functional Data Structures", fdsHelp, ListBuffer.empty)
+  topics += new Topic("Functional Data Structures", fdsHelp, exercises)
   topics += new Topic("Handling Errors", curryHelp,  ListBuffer.empty)
   topics += new Topic("Strictness and Laziness", functionsHelp, ListBuffer.empty)
 
@@ -180,22 +180,12 @@ object FuncProgView {
     labelHelpContent.setText("Help Contents")
     GridDataFactory.fillDefaults().grab(true, true).applyTo(labelHelpContent)
 
-   //add a list of exercises right here
-   // use master detail model binding
+    val listViewer = new ListViewer(dataBox)
+    GridDataFactory.fillDefaults().grab(false, true).applyTo(listViewer.getList)
+
+
     createWidgetBinding(textTitleContent, "title")
     createWidgetBinding(labelHelpContent, "help")
-
-    /*
-    val target = WidgetProperties.text(SWT.Modify).observe(textTitleContent)
-    val selectedItem = ViewerProperties.singleSelection[TableViewer, Topic]().observe(viewer)
-    val detailValue = BeanProperties.value("title").observeDetail(selectedItem)
-    import org.eclipse.core.databinding.UpdateValueStrategy
-    val widgetToModel = new UpdateValueStrategy[String, Nothing](UpdateValueStrategy.POLICY_NEVER)
-    val modelToWidget = new UpdateValueStrategy[Nothing, String](UpdateValueStrategy.POLICY_UPDATE)
-    dbc.bindValue(target, detailValue, widgetToModel, modelToWidget)
-
-     */
-
 
     dataBox
   }
