@@ -183,6 +183,9 @@ object FuncProgView {
     val listViewer = new ListViewer(dataBox)
     GridDataFactory.fillDefaults().grab(false, true).applyTo(listViewer.getList)
 
+    val lblOutput = createReadOnlyLabel(dataBox)
+    GridDataFactory.fillDefaults().grab(true, true).applyTo(lblOutput)
+
 
     createWidgetBinding(textTitleContent, "title")
     createWidgetBinding(labelHelpContent, "help")
