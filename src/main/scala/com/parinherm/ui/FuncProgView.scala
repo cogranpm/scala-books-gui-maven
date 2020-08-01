@@ -12,7 +12,7 @@ import org.eclipse.jface.databinding.swt.typed.WidgetProperties
 import org.eclipse.jface.databinding.viewers.ViewerSupport
 import org.eclipse.jface.databinding.viewers.typed.ViewerProperties
 import org.eclipse.jface.layout.{GridDataFactory, GridLayoutFactory}
-import org.eclipse.jface.viewers.{ListViewer, TableViewer, TableViewerColumn}
+import org.eclipse.jface.viewers.{ISelectionChangedListener, ListViewer, SelectionChangedEvent, TableViewer, TableViewerColumn}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.SashForm
 import org.eclipse.swt.graphics.Color
@@ -42,7 +42,8 @@ trait BoundPropertyBean
     pcs.firePropertyChange(new PropertyChangeEvent(this, name, oldVal, newVal))
 }
 
-class Exercise (@BeanProperty var title: String)
+class Exercise (@BeanProperty var title: String, val func: () => String)
+extends Object with BoundPropertyBean
 
 // mucking about with databinding
 // this is readonly display, so no propertychange fire required on set
@@ -99,8 +100,10 @@ object FuncProgView {
 
   // there are many exercises per topic, associate via the topic key
   val exercises = ListBuffer.empty[Exercise]
-  exercises += new Exercise("Functions")
-  exercises += new Exercise("Currying")
+  val testFunction: () => String = ()  => "running a function"
+  val differentFunction: () => String = () => "running a diffferent function"
+  exercises += new Exercise("Functions",  testFunction)
+  exercises += new Exercise("Currying", differentFunction)
 
 
   val topics = ListBuffer.empty[Topic]
@@ -110,10 +113,18 @@ object FuncProgView {
 
 
   var viewer: TableViewer = null
+  var exerciseViewer: ListViewer = null
+  var labelOutput: Text = null
 
   val dbc = new DataBindingContext()
 
-  def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY)
+  def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI)
+
+  def createBox(parent: Composite) = {
+    val box = new Composite(parent, SWT.BORDER)
+    box.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).margins(10, 10).create())
+    box
+  }
 
   def createWidgetBinding(widget: Control, propertyName: String) = {
     val target = WidgetProperties.text(SWT.Modify).observe(widget)
@@ -123,6 +134,13 @@ object FuncProgView {
     val widgetToModel = new UpdateValueStrategy[String, Nothing](UpdateValueStrategy.POLICY_NEVER)
     val modelToWidget = new UpdateValueStrategy[Nothing, String](UpdateValueStrategy.POLICY_UPDATE)
     dbc.bindValue(target, detailValue, widgetToModel, modelToWidget)
+  }
+
+  def bindExercises(topic: Topic) = {
+    val input: WritableList[Exercise] = WritableList.withElementType(classOf[Exercise])
+    input.addAll(topic.exercises.asJavaCollection)
+    ViewerSupport.bind(exerciseViewer, input, BeanProperties.value(classOf[Exercise], "title"))
+
   }
 
   def create(parent: Composite):  Composite ={
@@ -151,6 +169,16 @@ object FuncProgView {
     //input.add(new Exercise("Trying"))
     input.addAll(getTopics())
     ViewerSupport.bind(viewer, input, BeanProperties.value(classOf[Topic], "title"))
+
+
+    viewer.addSelectionChangedListener(new ISelectionChangedListener {
+      override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
+          val selections = viewer.getStructuredSelection
+          val firstElement = selections.getFirstElement.asInstanceOf[Topic]
+          bindExercises(firstElement)
+      }
+    })
+
     listBox
   }
 
@@ -180,11 +208,28 @@ object FuncProgView {
     labelHelpContent.setText("Help Contents")
     GridDataFactory.fillDefaults().grab(true, true).applyTo(labelHelpContent)
 
-    val listViewer = new ListViewer(dataBox)
-    GridDataFactory.fillDefaults().grab(false, true).applyTo(listViewer.getList)
+    /* a box containing exercises stuff */
+    val exerciseBox = createBox(dataBox)
+    GridDataFactory.fillDefaults().span(2, 1).grab(true, true).applyTo(exerciseBox)
 
-    val lblOutput = createReadOnlyLabel(dataBox)
-    GridDataFactory.fillDefaults().grab(true, true).applyTo(lblOutput)
+    val labelExercise = new Label(exerciseBox, SWT.NONE)
+    labelExercise.setText("Exercises")
+    GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(labelExercise)
+
+    exerciseViewer = new ListViewer(exerciseBox)
+    GridDataFactory.fillDefaults().grab(false, true).applyTo(exerciseViewer.getList)
+    exerciseViewer.addSelectionChangedListener(new ISelectionChangedListener {
+      override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
+          //run the code of this thing
+          val selections = exerciseViewer.getStructuredSelection
+          val selectedExercise = selections.getFirstElement.asInstanceOf[Exercise]
+          labelOutput.setText(selectedExercise.func.apply)
+
+      }
+    })
+
+    labelOutput = createReadOnlyLabel(exerciseBox)
+    GridDataFactory.fillDefaults().grab(true, true).applyTo(labelOutput)
 
 
     createWidgetBinding(textTitleContent, "title")
