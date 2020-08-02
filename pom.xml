@@ -11,7 +11,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <swt.version>3.114.100</swt.version>
+    <!--<swt.version>3.114.100</swt.version>-->
+    <swt.version>3.110.0</swt.version>
     <java.version>1.8</java.version>
     <scala.version>2.13.3</scala.version>
   </properties>
@@ -217,7 +218,7 @@
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.swt</artifactId>
-        <version>3.114.100</version>
+        <version>${swt.version}</version>
       </dependency>
 
       <dependency>
@@ -306,7 +307,7 @@
               </args>
               <jvmArgs>
                 <jvmArg>-Xmx128m</jvmArg>
-                <jvmArg>-XstartOnFirstThread</jvmArg>
+                <!--<jvmArg>-XstartOnFirstThread</jvmArg>-->
               </jvmArgs>
 
             </launcher>

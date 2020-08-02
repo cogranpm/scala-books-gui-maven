@@ -33,23 +33,21 @@ import org.eclipse.nebula.widgets.pshelf._
 import DbFunctions._
 import DBTests._
 import com.parinherm.model.{Chapter2Document, ReferenceDoc, ScalableLanguageDocument, FuncProgScala}
-import com.parinherm.ui.{ReferenceDocView,  FuncProgView}
+import com.parinherm.ui.{ReferenceDocView, FuncProgView, BrowserTest}
 import java.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths, Files}
 
 
-
-
-class MainWindow extends ApplicationWindow(null){
+class MainWindow extends ApplicationWindow(null) {
 
   addToolBar(SWT.FLAT | SWT.WRAP)
   addMenuBar()
   addStatusLine()
 
   var mainContainer: Composite = null
-  var navReference:PShelfItem = null
+  var navReference: PShelfItem = null
   var navFuncProg: PShelfItem = null
   var folder: CTabFolder = null
 
@@ -152,15 +150,14 @@ class MainWindow extends ApplicationWindow(null){
     folder.setSelection(tabItem)
   }
 
-  def createReferenceButtons(): Unit =
-  {
+  def createReferenceButtons(): Unit = {
     try {
       //this is a database test
       //DbFunctions.runQuery()
       //DbFunctions.insertBook("Neophytes guide to scala")
       //DbFunctions.close()
 
-    } catch  {
+    } catch {
       case ex: Exception => {
         println("error")
       }
@@ -169,8 +166,7 @@ class MainWindow extends ApplicationWindow(null){
 
     val chapter1Desc = "Chapter 1"
     val handler: SelectionListener = widgetSelectedAdapter(
-      (e: SelectionEvent) =>
-      {
+      (e: SelectionEvent) => {
         val scalableLanguageDocument = new ScalableLanguageDocument("Chapter1.doc")
         addReferenceTab(chapter1Desc, scalableLanguageDocument)
       })
@@ -178,9 +174,8 @@ class MainWindow extends ApplicationWindow(null){
     addReferenceButton(navReference, chapter1Desc, handler)
 
     val chapter2Desc = "Chapter 2"
-    val chapter2Handler = widgetSelectedAdapter (
-      (e: SelectionEvent) =>
-      {
+    val chapter2Handler = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
         val chap2Doc = new Chapter2Document("Chapter2.doc")
         addReferenceTab(chapter2Desc, chap2Doc)
       })
@@ -188,18 +183,16 @@ class MainWindow extends ApplicationWindow(null){
 
 
     val funcScalaDesc = "Summary"
-    val funcScala = widgetSelectedAdapter (
-      (e: SelectionEvent) =>
-      {
+    val funcScala = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
         val funcScalaDoc = new FuncProgScala("FuncProgScala.doc")
         addReferenceTab(funcScalaDesc, funcScalaDoc)
       })
     addReferenceButton(navFuncProg, funcScalaDesc, funcScala)
 
     val funcScalaExercisesDesc = "Exercises"
-    val funcScalaExercisesHandler = widgetSelectedAdapter (
-      (e: SelectionEvent) =>
-      {
+    val funcScalaExercisesHandler = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
         val funcScalaExercisesView = FuncProgView.create(folder)
         addTab(funcScalaExercisesDesc, funcScalaExercisesView)
       })
@@ -207,151 +200,15 @@ class MainWindow extends ApplicationWindow(null){
 
     val browserDesc = "Browser Test"
     val browserHandler = widgetSelectedAdapter(
-      (e: SelectionEvent) =>
-        {
-          val browserView = BrowserTest.create(folder)
-          addTab("Browser", browserView)
-        }
+      (e: SelectionEvent) => {
+        val browserView = BrowserTest.create(folder)
+        addTab("Browser", browserView)
+      }
     )
     addReferenceButton(navReference, browserDesc, browserHandler)
-}
-
-
-
-}
-
-
-object FuncProg{
-
-}
-
-object BrowserTest {
-
-  import org.eclipse.swt.browser.{Browser, ProgressEvent, ProgressListener}
-  //val newOne = "https://prekitt.lwtears.com/books/TGPKGSS1/2021/2"
-  var browser: Browser = null
-  var txtUrl: Text = null
-  var buttonNext: Button = null
-  var buttonRun: Button = null
-  var iteration: Int = 0
-  var folderName: String = "lwt-mybook"
-  //val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS1/2021"
-  //val baseURL = "https://prekitt.lwtears.com/books/MFSB/2021"
-  //val baseURL = "https://prekitt.lwtears.com/books/MFLB/2021"
-  //val baseURL = "https://prekitt.lwtears.com/books/IKMN/2021"
-  //val baseURL = "https://prekitt.lwtears.com/books/TGPKGSS/2021"
-  val baseURL = "https://prekitt.lwtears.com/books/MB/2021"
-
-  def processImages(current_iteration: Int): Unit = {
-    /* runs a script within the browser page that is loaded in the browser control
-    script will locate call canvas elements - which contain an image
-    and will use the toDataURL method to get the binary data of the image within
-    strip out the header text then return then in an array to the scala client code
-    hosting the browser control
-
-    the scala code will decode the data and save to a file
-    using an index notation for the file names
-    */
-    val script =
-      """ function getData() {
-        | let items = document.querySelectorAll('canvas');
-        | let finishedItems = [];
-        | //let data = item[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
-        | for (let i = 0; i < items.length; i++) {
-        |   let item = items[i];
-        |   let itemData = item.toDataURL('image/png');
-        |   let strippedItemData = itemData.replace(/^data:image\/(png|jpg);base64,/, "");
-        |   finishedItems.push(strippedItemData);
-        | }
-        | return finishedItems;
-        | }
-        |
-        | return getData();""".stripMargin
-    val result: Array[Object] = browser.evaluate(script).asInstanceOf[Array[Object]]
-    var index = 0
-    for (item <- result){
-      val imageData = Base64.getDecoder.decode(item.toString)
-      val pageNo = index + current_iteration
-      val imagePath: Path = Paths.get(s"${folderName}/page_${pageNo}.png")
-      try{
-        Files.write(imagePath,  imageData)
-      } catch {
-        case e: IOException => println(e.getMessage)
-      }
-      index += 1
-
-
-    }
   }
 
-  def create(parent: Composite) : Composite = {
-    val composite = new Composite(parent, SWT.NONE)
-    val buttonBar = new Composite(composite, SWT.NONE)
-    val buttonLoad = new Button(buttonBar, SWT.PUSH)
-    buttonLoad.setText("Load")
 
-    txtUrl = new Text(buttonBar, SWT.SINGLE)
-    txtUrl.setText(baseURL)
-
-    buttonRun = new Button(buttonBar, SWT.PUSH)
-    buttonRun.setText("&Run")
-    buttonRun.setEnabled(false)
-
-    buttonNext = new Button(buttonBar, SWT.PUSH)
-    buttonNext.setText("Next")
-    buttonRun.setEnabled(false)
-
-
-    browser = new Browser(composite, SWT.NONE)
-    browser.setJavascriptEnabled(true)
-    //browser.setUrl("https://www.lwtears.com/mylwt")
-    //browser.setUrl("https://prekitt.lwtears.com/books/TGPKGSS1/2021")
-
-    browser.addProgressListener(new ProgressListener() {
-      override def completed(event: ProgressEvent): Unit = {
-        buttonRun.setEnabled(true)
-      }
-
-      override def changed(event: ProgressEvent): Unit = println("changed")
-
-    })
-
-    buttonBar.setLayout(new RowLayout())
-    composite.setLayout(new GridLayout(1, false))
-    GridDataFactory.fillDefaults.grab(true, false).applyTo(buttonBar)
-    GridDataFactory.fillDefaults.grab(true, true).applyTo(browser)
-
-    buttonLoad.addSelectionListener(widgetSelectedAdapter(
-      (e: SelectionEvent) =>
-      {
-        println(s"about to load ${txtUrl.getText()}")
-        browser.setUrl(txtUrl.getText())
-      }))
-
-    buttonNext.addSelectionListener(widgetSelectedAdapter(
-      (e: SelectionEvent) =>
-      {
-        txtUrl.setText(s"${baseURL}/${iteration}")
-        println(s"about to load ${txtUrl.getText()}")
-        browser.setUrl(txtUrl.getText())
-      }))
-
-    // run button will process images in current page then load the next page
-    buttonRun.addSelectionListener(widgetSelectedAdapter(
-      (e: SelectionEvent) =>
-        {
-          buttonRun.setEnabled(false)
-          processImages(iteration)
-          iteration += 2
-          //load up next page
-          txtUrl.setText(s"${baseURL}/${iteration}")
-          println(s"about to load ${txtUrl.getText()}")
-          browser.setUrl(txtUrl.getText())
-        }
-    ))
-
-    composite
-  }
 }
 
 
