@@ -32,12 +32,12 @@ import org.eclipse.swt.widgets.Button
 import org.eclipse.nebula.widgets.pshelf._
 import DbFunctions._
 import DBTests._
-import com.parinherm.model.{Chapter2Document, ReferenceDoc, ScalableLanguageDocument, FuncProgScala}
-import com.parinherm.ui.{ReferenceDocView, FuncProgView, BrowserTest}
+import com.parinherm.model.{Chapter2Document, FuncProgScala, FuncProgView, ReferenceDoc, ScalableLanguageDocument, ScalableLanguageNotes}
+import com.parinherm.ui.{BrowserTest, ReferenceDocView, TopicsView}
 import java.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Path, Paths, Files}
+import java.nio.file.{Files, Path, Paths}
 
 
 class MainWindow extends ApplicationWindow(null) {
@@ -49,6 +49,7 @@ class MainWindow extends ApplicationWindow(null) {
   var mainContainer: Composite = null
   var navReference: PShelfItem = null
   var navFuncProg: PShelfItem = null
+  var navScalableLanguage: PShelfItem = null
   var folder: CTabFolder = null
 
   override def createContents(parent: Composite): Control = {
@@ -76,12 +77,11 @@ class MainWindow extends ApplicationWindow(null) {
     navFuncProg.setText("Functional Programming in Scala")
     navFuncProg.getBody.setLayout(new RowLayout(SWT.VERTICAL))
 
-    folder = new CTabFolder(mainContainer, SWT.TOP | SWT.BORDER)
-    val item = new CTabItem(folder, SWT.NONE)
-    item.setText("&Getting Started")
-    val masterPropertyTabItem = new CTabItem(folder, SWT.NONE)
-    masterPropertyTabItem.setText("&Master Properties")
+    navScalableLanguage = new PShelfItem(navShelf, SWT.NONE)
+    navScalableLanguage.setText("Programming in Scala")
+    navScalableLanguage.getBody.setLayout(new RowLayout(SWT.VERTICAL))
 
+    folder = new CTabFolder(mainContainer, SWT.TOP | SWT.BORDER)
     createReferenceButtons()
     container
   }
@@ -134,7 +134,7 @@ class MainWindow extends ApplicationWindow(null) {
 
   def addReferenceTab(name: String, referenceDoc: ReferenceDoc): Unit = {
     val docView: ReferenceDocView = new ReferenceDocView(folder, SWT.BORDER, referenceDoc)
-    val tabItem = new CTabItem(folder, SWT.NONE)
+    val tabItem = new CTabItem(folder, SWT.CLOSE)
     tabItem.setText(name)
     tabItem.setControl(docView)
     mainContainer.layout()
@@ -143,7 +143,7 @@ class MainWindow extends ApplicationWindow(null) {
   }
 
   def addTab(name: String, view: Composite): Unit = {
-    val tabItem = new CTabItem(folder, SWT.NONE)
+    val tabItem = new CTabItem(folder, SWT.CLOSE)
     tabItem.setText(name)
     tabItem.setControl(view)
     mainContainer.layout()
@@ -151,38 +151,26 @@ class MainWindow extends ApplicationWindow(null) {
   }
 
   def createReferenceButtons(): Unit = {
+
+    /*
     try {
       //this is a database test
-      //DbFunctions.runQuery()
+      DbFunctions.runQuery()
       //DbFunctions.insertBook("Neophytes guide to scala")
-      //DbFunctions.close()
+      DbFunctions.close()
 
     } catch {
       case ex: Exception => {
         println("error")
       }
-
     }
-
-    val chapter1Desc = "Chapter 1"
-    val handler: SelectionListener = widgetSelectedAdapter(
-      (e: SelectionEvent) => {
-        val scalableLanguageDocument = new ScalableLanguageDocument("Chapter1.doc")
-        addReferenceTab(chapter1Desc, scalableLanguageDocument)
-      })
-
-    addReferenceButton(navReference, chapter1Desc, handler)
-
-    val chapter2Desc = "Chapter 2"
-    val chapter2Handler = widgetSelectedAdapter(
-      (e: SelectionEvent) => {
-        val chap2Doc = new Chapter2Document("Chapter2.doc")
-        addReferenceTab(chapter2Desc, chap2Doc)
-      })
-    addReferenceButton(navReference, chapter2Desc, chapter2Handler)
+     */
 
 
-    val funcScalaDesc = "Summary"
+    /*********************************************
+     * Functional Programming in Scala Book
+     */
+    val funcScalaDesc = "Notes"
     val funcScala = widgetSelectedAdapter(
       (e: SelectionEvent) => {
         val funcScalaDoc = new FuncProgScala("FuncProgScala.doc")
@@ -190,14 +178,45 @@ class MainWindow extends ApplicationWindow(null) {
       })
     addReferenceButton(navFuncProg, funcScalaDesc, funcScala)
 
-    val funcScalaExercisesDesc = "Exercises"
+    val funcScalaExercisesDesc = "Topics"
     val funcScalaExercisesHandler = widgetSelectedAdapter(
       (e: SelectionEvent) => {
-        val funcScalaExercisesView = FuncProgView.create(folder)
+        val funcScalaExercisesView = TopicsView.create(folder, FuncProgView.topics)
         addTab(funcScalaExercisesDesc, funcScalaExercisesView)
       })
     addReferenceButton(navFuncProg, funcScalaExercisesDesc, funcScalaExercisesHandler)
 
+
+    /****************************************
+     * Scala Programming lanauge
+     */
+    val splHandler = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
+        val splView = TopicsView.create(folder, ScalableLanguageNotes.topics)
+        addTab("Topics", splView)
+      })
+    addReferenceButton(navScalableLanguage, "Topics", splHandler)
+
+    val chapter1Desc = "Chapter 1"
+    val handler: SelectionListener = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
+        val scalableLanguageDocument = new ScalableLanguageDocument("Chapter1.doc")
+        addReferenceTab(chapter1Desc, scalableLanguageDocument)
+      })
+    addReferenceButton(navScalableLanguage, chapter1Desc, handler)
+
+    val chapter2Desc = "Chapter 2"
+    val chapter2Handler = widgetSelectedAdapter(
+      (e: SelectionEvent) => {
+        val chap2Doc = new Chapter2Document("Chapter2.doc")
+        addReferenceTab(chapter2Desc, chap2Doc)
+      })
+    addReferenceButton(navScalableLanguage, chapter2Desc, chapter2Handler)
+
+
+    /**************************************************
+     * Browser hacking stuff
+     */
     val browserDesc = "Browser Test"
     val browserHandler = widgetSelectedAdapter(
       (e: SelectionEvent) => {

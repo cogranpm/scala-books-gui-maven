@@ -1,13 +1,12 @@
 package com.parinherm.ui
 
-import java.beans.{PropertyChangeEvent, PropertyChangeListener, PropertyChangeSupport}
 import java.util
 
-import org.eclipse.core.databinding.DataBindingContext
-import org.eclipse.core.databinding.beans.IBeanValueProperty
-import org.eclipse.core.databinding.beans.typed.{BeanProperties, PojoProperties}
+import com.parinherm.model.{Exercise, Topic}
+import com.parinherm.model.FuncProgView.{exercises, topics}
+import org.eclipse.core.databinding.{DataBindingContext, UpdateValueStrategy}
+import org.eclipse.core.databinding.beans.typed.BeanProperties
 import org.eclipse.core.databinding.observable.list.WritableList
-import org.eclipse.core.databinding.property.value.IValueProperty
 import org.eclipse.jface.databinding.swt.typed.WidgetProperties
 import org.eclipse.jface.databinding.viewers.ViewerSupport
 import org.eclipse.jface.databinding.viewers.typed.ViewerProperties
@@ -15,127 +14,35 @@ import org.eclipse.jface.layout.{GridDataFactory, GridLayoutFactory}
 import org.eclipse.jface.viewers.{ISelectionChangedListener, ListViewer, SelectionChangedEvent, TableViewer, TableViewerColumn}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.SashForm
-import org.eclipse.swt.graphics.Color
-import org.eclipse.swt.layout.{FillLayout, GridLayout}
-import org.eclipse.swt.widgets.{Composite, Control, Display, Label, Text}
+import org.eclipse.swt.layout.FillLayout
+import org.eclipse.swt.widgets.{Composite, Control, Label, Text}
 
-import scala.beans.BeanProperty
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
-import org.eclipse.core.databinding.UpdateValueStrategy
 
+object TopicsView {
 
-
-trait BoundPropertyBean
-{
-
-  val pcs = new PropertyChangeSupport(this)
-
-  def addPropertyChangeListener(pcl : PropertyChangeListener) =
-    pcs.addPropertyChangeListener(pcl)
-
-  def removePropertyChangeListener(pcl : PropertyChangeListener) =
-    pcs.removePropertyChangeListener(pcl)
-
-  def firePropertyChange(name : String, oldVal : Any, newVal : Any) : Unit =
-    pcs.firePropertyChange(new PropertyChangeEvent(this, name, oldVal, newVal))
-}
-
-class Exercise (@BeanProperty var title: String, val func: () => String)
-extends Object with BoundPropertyBean
-
-// mucking about with databinding
-// this is readonly display, so no propertychange fire required on set
-// therefore use @BeanProperty to autogenerate default setters
-class Topic (@BeanProperty val title: String,
-             @BeanProperty val help: String,
-             @BeanProperty val exercises: ListBuffer[Exercise])
-extends Object with BoundPropertyBean
-/*{
-
-  def setTitle(newValue: String) = {
-    val oldValue = title
-    title = newValue
-    firePropertyChange("title", oldValue, newValue)
-  }
-
-  def getTitle(): String = title
-
-}
-
-object PCL
-  extends java.beans.PropertyChangeListener
-{
-  override def propertyChange(pce:java.beans.PropertyChangeEvent):Unit =
-  {
-    System.out.println("Bean changed its " + pce.getPropertyName() +
-      " from " + pce.getOldValue() +
-      " to " + pce.getNewValue())
-  }
-}
-*/
-
-
-
-object FuncProgView {
-
-
-  // creating some data in code here
-  // maybe move to database later
-  val firstExample =
-"""
-case classes - immutable fields, new not required
-return value object that represents a charge - as a case class
-don't actually charge the card
-pure functions allow for local reasoning
-eliminate side effects
-
-"""
-
-  val functionsHelp =
-    """
-      |um, functions
-      |""".stripMargin
-
-  val introducingScala =
-    """
-      | object - a singleton
-      | as in:
-      | object MyModule {
-      |   def abs(n: Int):Int =
-      |     if (n < 0) -n
-      |     else n
-      |
-      |   private def formatAbs(x: Int) = {
-      |     val msg = "blah %d %d"
-      |     msg.format(x, abs(x))
-      |   }
-      |
-      |   def main(args: Array[String]): Unit =
-      |     println(formatAbs(-42))
-      | }
-      |""".stripMargin
-
-  // there are many exercises per topic, associate via the topic key
-  val exercises = ListBuffer.empty[Exercise]
-  val testFunction: () => String = ()  => "running a function"
-  val differentFunction: () => String = () => "running a diffferent function"
-  exercises += new Exercise("Functions",  testFunction)
-  exercises += new Exercise("Currying", differentFunction)
-
-
-  val topics = ListBuffer.empty[Topic]
-  topics += new Topic("First Example", firstExample, ListBuffer.empty)
-  topics += new Topic("Introducing Scala", introducingScala,  exercises)
-  topics += new Topic("Strictness and Laziness", functionsHelp, exercises)
-
-
+  var topics: ListBuffer[Topic] = null
   var viewer: TableViewer = null
   var exerciseViewer: ListViewer = null
   var labelOutput: Text = null
 
   val dbc = new DataBindingContext()
+
+  def create(parent: Composite, topics: ListBuffer[Topic]):  Composite ={
+    this.topics = topics
+    val root = new Composite(parent, SWT.NONE)
+    val mainSash = new SashForm(root, SWT.HORIZONTAL)
+    mainSash.setLayout(new FillLayout())
+
+    val listBox = createListBox(mainSash)
+    val dataBox = createDataBox(mainSash)
+
+    mainSash.setWeights(Array(20, 80))
+    root.setLayout(new FillLayout())
+    root
+  }
+
 
   def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI)
 
@@ -162,18 +69,6 @@ eliminate side effects
 
   }
 
-  def create(parent: Composite):  Composite ={
-    val root = new Composite(parent, SWT.NONE)
-    val mainSash = new SashForm(root, SWT.HORIZONTAL)
-    mainSash.setLayout(new FillLayout())
-
-    val listBox = createListBox(mainSash)
-    val dataBox = createDataBox(mainSash)
-
-    mainSash.setWeights(Array(20, 80))
-    root.setLayout(new FillLayout())
-    root
-  }
 
 
   def createListBox(parent: Composite) : Composite = {
@@ -192,9 +87,9 @@ eliminate side effects
 
     viewer.addSelectionChangedListener(new ISelectionChangedListener {
       override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
-          val selections = viewer.getStructuredSelection
-          val firstElement = selections.getFirstElement.asInstanceOf[Topic]
-          bindExercises(firstElement)
+        val selections = viewer.getStructuredSelection
+        val firstElement = selections.getFirstElement.asInstanceOf[Topic]
+        bindExercises(firstElement)
       }
     })
 
@@ -239,10 +134,10 @@ eliminate side effects
     GridDataFactory.fillDefaults().grab(false, true).applyTo(exerciseViewer.getList)
     exerciseViewer.addSelectionChangedListener(new ISelectionChangedListener {
       override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
-          //run the code of this thing
-          val selections = exerciseViewer.getStructuredSelection
-          val selectedExercise = selections.getFirstElement.asInstanceOf[Exercise]
-          labelOutput.setText(selectedExercise.func.apply)
+        //run the code of this thing
+        val selections = exerciseViewer.getStructuredSelection
+        val selectedExercise = selections.getFirstElement.asInstanceOf[Exercise]
+        labelOutput.setText(selectedExercise.func.apply)
 
       }
     })
@@ -258,12 +153,9 @@ eliminate side effects
   }
 
   def getTopics(): util.Collection[Topic] = {
-    topics.asJavaCollection
+    this.topics.asJavaCollection
   }
 
-  def getExercisesData(): util.Collection[Exercise] = {
 
-    exercises.asJavaCollection
-  }
 
 }
