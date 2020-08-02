@@ -83,19 +83,38 @@ object FuncProgView {
 
   // creating some data in code here
   // maybe move to database later
-  val fdsHelp =
-    """
-      | um, some functional data structures here
-      |""".stripMargin
+  val firstExample =
+"""
+case classes - immutable fields, new not required
+return value object that represents a charge - as a case class
+don't actually charge the card
+pure functions allow for local reasoning
+eliminate side effects
+
+"""
 
   val functionsHelp =
     """
       |um, functions
       |""".stripMargin
 
-  val curryHelp =
+  val introducingScala =
     """
-      | um, currying
+      | object - a singleton
+      | as in:
+      | object MyModule {
+      |   def abs(n: Int):Int =
+      |     if (n < 0) -n
+      |     else n
+      |
+      |   private def formatAbs(x: Int) = {
+      |     val msg = "blah %d %d"
+      |     msg.format(x, abs(x))
+      |   }
+      |
+      |   def main(args: Array[String]): Unit =
+      |     println(formatAbs(-42))
+      | }
       |""".stripMargin
 
   // there are many exercises per topic, associate via the topic key
@@ -107,9 +126,9 @@ object FuncProgView {
 
 
   val topics = ListBuffer.empty[Topic]
-  topics += new Topic("Functional Data Structures", fdsHelp, exercises)
-  topics += new Topic("Handling Errors", curryHelp,  ListBuffer.empty)
-  topics += new Topic("Strictness and Laziness", functionsHelp, ListBuffer.empty)
+  topics += new Topic("First Example", firstExample, ListBuffer.empty)
+  topics += new Topic("Introducing Scala", introducingScala,  exercises)
+  topics += new Topic("Strictness and Laziness", functionsHelp, exercises)
 
 
   var viewer: TableViewer = null
