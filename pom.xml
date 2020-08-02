@@ -306,7 +306,7 @@
                 <arg>arg1</arg>
               </args>
               <jvmArgs>
-                <jvmArg>-Xmx128m</jvmArg>
+                <!--<jvmArg>-Xmx128m</jvmArg>-->
                 <!--<jvmArg>-XstartOnFirstThread</jvmArg>-->
               </jvmArgs>
 
