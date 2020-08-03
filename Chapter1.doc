@@ -31,3 +31,38 @@ class ChecksumActor extends Actor {
 //note how the receive block is a method, and ! is an operator
 
 //functions are objects
+
+var capital = Map("US" -> "Washington", "France" -> "Paris")
+capital += ("Japan" -> "Tokyo")
+println(capital("France"))
+
+//no types, semi colons
+
+//scala has it's own BigInt type
+
+def factorial(x: BigInt): BigInt =
+  if (x == 0) 1 else x * factorial(x - 1)
+//you can use oeprators such as * and - with BigInt, makes it look like a built in type
+//it is in fact a class
+//scala lets you create libs that feel like native language support
+//thus is is scalable
+
+//here's an Akka actor example
+/*
+class ChecksumActor extends Actor {
+  var sum = 0
+
+  //receive block
+  def receive = {
+    case Data(byte) => sum += byte
+    case GetChecksum(requester) =>
+      val checksum = ~(sum & 0xFF) + 1
+      requester ! checksum //! is send message
+  }
+}
+ */
+
+//note how the receive block is a method, and ! is an operator
+
+//functions are objects
+

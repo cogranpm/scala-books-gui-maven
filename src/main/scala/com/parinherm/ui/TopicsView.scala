@@ -64,7 +64,9 @@ object TopicsView {
 
   def bindExercises(topic: Topic) = {
     val input: WritableList[Exercise] = WritableList.withElementType(classOf[Exercise])
-    input.addAll(topic.exercises.asJavaCollection)
+    if (!topic.exercises.isEmpty) {
+      input.addAll(topic.exercises.asJavaCollection)
+    }
     ViewerSupport.bind(exerciseViewer, input, BeanProperties.value(classOf[Exercise], "title"))
 
   }
@@ -87,9 +89,11 @@ object TopicsView {
 
     viewer.addSelectionChangedListener(new ISelectionChangedListener {
       override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
-        val selections = viewer.getStructuredSelection
-        val firstElement = selections.getFirstElement.asInstanceOf[Topic]
-        bindExercises(firstElement)
+        if (!viewer.getStructuredSelection.isEmpty) {
+          val selections = viewer.getStructuredSelection
+          val firstElement = selections.getFirstElement.asInstanceOf[Topic]
+          bindExercises(firstElement)
+        }
       }
     })
 
@@ -131,7 +135,7 @@ object TopicsView {
     GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(labelExercise)
 
     exerciseViewer = new ListViewer(exerciseBox)
-    GridDataFactory.fillDefaults().grab(false, true).applyTo(exerciseViewer.getList)
+    GridDataFactory.fillDefaults().grab(false, true).hint(350, SWT.DEFAULT).applyTo(exerciseViewer.getList)
     exerciseViewer.addSelectionChangedListener(new ISelectionChangedListener {
       override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
         //run the code of this thing
