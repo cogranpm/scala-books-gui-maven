@@ -53,5 +53,4 @@ eliminate side effects
   topics += new Topic("Strictness and Laziness", functionsHelp, exercises)
 
 
-
 }
