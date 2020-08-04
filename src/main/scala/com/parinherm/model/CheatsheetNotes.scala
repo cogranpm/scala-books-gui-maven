@@ -101,6 +101,12 @@ calling a varargs method with a 'Seq'
     output.toString()
   }
 
+  def demoRegularExpressions(): String = {
+    var output = new StringBuilder("Begin\n")
+
+    output.toString()
+  }
+
 
   def fnClasses(): String = {
     "classes and stuff"
