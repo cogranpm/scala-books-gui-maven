@@ -29,14 +29,14 @@ object NavigationData {
 
  def createCheatSheets(parentTab: CTabFolder) : NavigationHeader = {
    /* cheatsheets */
-   val view = TopicsView.create(parentTab, CheatsheetNotes.topics)
+   val view = new TopicsView(parentTab, CheatsheetNotes.topics)
    val item = NavigationItem("Jax", createTabHandler(parentTab, view, "Jax"))
    val header = NavigationHeader("Cheatsheets", List(item))
     header
  }
 
   def createScalaProgrammingLanguage(parentTab: CTabFolder) = {
-    val topicsView = TopicsView.create(parentTab, ScalableLanguageNotes.topics)
+    val topicsView = new TopicsView(parentTab, ScalableLanguageNotes.topics)
     val scalableLanguageDocument = new ScalableLanguageDocument("Chapter1.doc")
     val chap2Doc = new Chapter2Document("Chapter2.doc")
     val topic = NavigationItem("Topics", createTabHandler(parentTab, topicsView, "Topics"))
@@ -49,7 +49,7 @@ object NavigationData {
 
 
   def createFunctionalProgrammingInScala(parentTab: CTabFolder) = {
-    val topicsView = TopicsView.create(parentTab, FuncProgView.topics)
+    val topicsView = new TopicsView(parentTab, FuncProgView.topics)
     val doc = new FuncProgScala("FuncProgScala.doc")
 
     val topics = NavigationItem("Topics", createTabHandler(parentTab, topicsView, "Topics"))
@@ -62,7 +62,6 @@ object NavigationData {
   def createTabItem(parentTab: CTabFolder, title: String, view: Composite) = {
     val tabItem = new CTabItem(parentTab, SWT.CLOSE)
     tabItem.setText(title)
-
     tabItem.setControl(view)
     tabItem
   }

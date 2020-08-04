@@ -20,28 +20,25 @@ import org.eclipse.swt.widgets.{Composite, Control, Label, Text}
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-object TopicsView {
+class TopicsView(val daParent: Composite, val topics: ListBuffer[Topic]) extends Composite(daParent, SWT.NONE) {
 
-  var topics: ListBuffer[Topic] = null
   var viewer: TableViewer = null
   var exerciseViewer: ListViewer = null
   var labelOutput: Text = null
 
   val dbc = new DataBindingContext()
 
-  def create(parent: Composite, topics: ListBuffer[Topic]):  Composite ={
-    this.topics = topics
-    val root = new Composite(parent, SWT.NONE)
-    val mainSash = new SashForm(root, SWT.HORIZONTAL)
-    mainSash.setLayout(new FillLayout())
+  //this.topics = topics
+  val root = new Composite(this, SWT.NONE)
+  val mainSash = new SashForm(root, SWT.HORIZONTAL)
+  mainSash.setLayout(new FillLayout())
 
-    val listBox = createListBox(mainSash)
-    val dataBox = createDataBox(mainSash)
+  val listBox = createListBox(mainSash)
+  val dataBox = createDataBox(mainSash)
 
-    mainSash.setWeights(Array(20, 80))
-    root.setLayout(new FillLayout())
-    root
-  }
+  mainSash.setWeights(Array(20, 80))
+  root.setLayout(new FillLayout())
+  this.setLayout(new FillLayout(SWT.VERTICAL))
 
 
   def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI)
@@ -72,8 +69,7 @@ object TopicsView {
   }
 
 
-
-  def createListBox(parent: Composite) : Composite = {
+  def createListBox(parent: Composite): Composite = {
     val listBox: Composite = new Composite(parent, SWT.NONE)
     listBox.setLayout(new FillLayout(SWT.VERTICAL))
     viewer = new TableViewer(listBox)
@@ -83,7 +79,7 @@ object TopicsView {
     viewer.getTable().setHeaderVisible(true)
     val input: WritableList[Topic] = WritableList.withElementType(classOf[Topic])
     //input.add(new Exercise("Trying"))
-    input.addAll(getTopics())
+    input.addAll(topics.asJavaCollection)
     ViewerSupport.bind(viewer, input, BeanProperties.value(classOf[Topic], "title"))
 
 
@@ -100,7 +96,7 @@ object TopicsView {
     listBox
   }
 
-  def createDataBox(parent: Composite): Composite ={
+  def createDataBox(parent: Composite): Composite = {
     /*
     form that has:
       label for displaying title
@@ -156,10 +152,12 @@ object TopicsView {
     dataBox
   }
 
+  /*
   def getTopics(): util.Collection[Topic] = {
     this.topics.asJavaCollection
   }
 
+   */
 
 
 }
