@@ -1,9 +1,8 @@
 package com.parinherm.model
 
+import scala.collection.mutable
+import scala.collection.mutable.{ListBuffer, StringBuilder}
 
-import com.parinherm.model.FuncProgView.exercises
-
-import scala.collection.mutable.ListBuffer
 
 object CheatsheetNotes {
 
@@ -32,11 +31,6 @@ calling a varargs method with a 'Seq'
 
 """
 
-  val demoVarsAndMethods: () => String = ()  => {
-    var output: String = ""
-    output += "Laziness lazy val z = 0"
-    output
-  }
 
   val strings_stuff =
     """ s for interpolation with $ around variables
@@ -70,15 +64,45 @@ calling a varargs method with a 'Seq'
       |
       |""".stripMargin
 
-  val varsAndMethodsExercises = ListBuffer.empty[Exercise]
-  varsAndMethodsExercises += new Exercise("Demo",  demoVarsAndMethods)
+
 
   val empty = ListBuffer.empty[Exercise]
 
 
   val topics = ListBuffer.empty[Topic]
-  topics += new Topic("Variables And Methods", variableAndMethodsHelp, varsAndMethodsExercises)
+  topics += new Topic("Variables And Methods", variableAndMethodsHelp,
+    createExercises(new Exercise("Demo",  demoVarsAndMethods)))
   topics += new Topic("Strings", strings_stuff, ListBuffer.empty[Exercise] )
   topics += new Topic("Regular Expressions", regex, ListBuffer.empty[Exercise])
-  topics += new Topic("Classes", classes, empty)
+  topics += new Topic("Classes", classes,
+    createExercises(new Exercise("Demo", fnClasses)))
+
+  def createExercises(exercise: Exercise*) : ListBuffer[Exercise] = {
+    val list = ListBuffer.empty[Exercise]
+    list.addAll(exercise)
+    list
+  }
+
+  def addLine(line: String, buffer: mutable.StringBuilder) = buffer ++= line ++= "\n"
+
+  def demoVarsAndMethods ():  String = {
+    var output = new mutable.StringBuilder("Begin \n")
+    lazy val z = "lazy"
+    val (one, two) = ("one", 2)
+    addLine( s"one: $one two: $two", output)
+    addLine("Laziness lazy val z = 0", output)
+
+    addLine("nested method and currying example", output)
+    def add(n: Int)(m: Int): Int = n + m
+    val adderTen = add(10)(_)
+    addLine(s"${adderTen(5)}", output)
+
+
+    output.toString()
+  }
+
+
+  def fnClasses(): String = {
+    "classes and stuff"
+  }
 }

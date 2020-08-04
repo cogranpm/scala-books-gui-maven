@@ -136,8 +136,10 @@ class TopicsView(val daParent: Composite, val topics: ListBuffer[Topic]) extends
       override def selectionChanged(selectionChangedEvent: SelectionChangedEvent): Unit = {
         //run the code of this thing
         val selections = exerciseViewer.getStructuredSelection
-        val selectedExercise = selections.getFirstElement.asInstanceOf[Exercise]
-        labelOutput.setText(selectedExercise.func.apply)
+        if (!selections.isEmpty) {
+          val selectedExercise = selections.getFirstElement.asInstanceOf[Exercise]
+          labelOutput.setText(selectedExercise.func.apply)
+        }
 
       }
     })
