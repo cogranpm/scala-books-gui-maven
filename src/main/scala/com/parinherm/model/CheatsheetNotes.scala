@@ -44,14 +44,41 @@ calling a varargs method with a 'Seq'
       | multiline in triple quotes " " "
       |""".stripMargin
 
+  val regex =
+    """
+      | val time = ...
+      |""".stripMargin
+
+
+  val classes =
+    """
+      |
+      |""".stripMargin
+
+ val objects =
+   """
+     |
+     |""".stripMargin
+
+  val traits =
+    """
+      |
+      |""".stripMargin
+
+  val case_classes =
+    """
+      |
+      |""".stripMargin
 
   val varsAndMethodsExercises = ListBuffer.empty[Exercise]
   varsAndMethodsExercises += new Exercise("Demo",  demoVarsAndMethods)
+
+  val empty = ListBuffer.empty[Exercise]
 
 
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("Variables And Methods", variableAndMethodsHelp, varsAndMethodsExercises)
   topics += new Topic("Strings", strings_stuff, ListBuffer.empty[Exercise] )
-
-
+  topics += new Topic("Regular Expressions", regex, ListBuffer.empty[Exercise])
+  topics += new Topic("Classes", classes, empty)
 }
