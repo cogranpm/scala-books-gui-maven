@@ -10,13 +10,25 @@ object CheatsheetNotes {
 
 
 val variableAndMethodsHelp =
-"""
-laziness: use lazy keyword in front of variable declaration
+"""laziness: use lazy keyword in front of variable declaration
+lazy val z = "lazy"
+
 pattern matching: val (one, two) = ("one", 2)
+
 simple method:
 def add(n: Int, m: Int): Int = n + m
+
 curried method:
 def add(n: Int)(m: Int): Int = n + m
+
+by name parameters (evaluates 'a' twice):
+def twice[A](a: => A) = { a; a }
+
+repeated parameters (varargs):
+def many(ns: Int*): Seq[Int] = ns
+
+calling a varargs method with a 'Seq'
+> many(Seq(1, 2) :_*)
 
 """
 
@@ -26,11 +38,20 @@ def add(n: Int)(m: Int): Int = n + m
     output
   }
 
-  val exercises = ListBuffer.empty[Exercise]
-  exercises += new Exercise("Demo",  demoVarsAndMethods)
+  val strings_stuff =
+    """ s for interpolation with $ around variables
+      | $ { } for complex expressions
+      | multiline in triple quotes " " "
+      |""".stripMargin
+
+
+  val varsAndMethodsExercises = ListBuffer.empty[Exercise]
+  varsAndMethodsExercises += new Exercise("Demo",  demoVarsAndMethods)
+
 
   val topics = ListBuffer.empty[Topic]
-  topics += new Topic("Variables And Methods", variableAndMethodsHelp, exercises)
+  topics += new Topic("Variables And Methods", variableAndMethodsHelp, varsAndMethodsExercises)
+  topics += new Topic("Strings", strings_stuff, ListBuffer.empty[Exercise] )
 
 
 }
