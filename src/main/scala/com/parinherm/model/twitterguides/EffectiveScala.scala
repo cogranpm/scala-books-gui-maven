@@ -53,9 +53,27 @@ object EffectiveScala {
       |   don't use it for converting similar datatypes, these are better explicit
       |""".stripMargin
 
+  val collections =
+    """
+      | basic type heirarchy
+      | Iterable[T] at top
+      | Seq[T] Set[T] Map[T]
+      | in mutable and immutable variants
+      | refer to mutable explicitly:
+      |   import scala.collection.mutable
+      |   val set = mutable.Set()
+      | don't import wildcard on mutable package
+      | use the default constructor: Seq(1,2,3) Set(1, 2, 3) or Map(1 -> "one", 2 -> "two")
+      | in parameters to methods, accapt the most generic type of collection
+      | either Iterable, Seq, Set or Map
+      | ie use Seq[T] not List[T]
+      |
+      |""".stripMargin
+
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("Formatting", formattingNotes, ListBuffer.empty[Exercise])
   topics += new Topic( "Types and Generics", typesAndGenerics, ListBuffer.empty)
+  topics += new Topic("Collections", collections, ListBuffer.empty)
 
 }
 
