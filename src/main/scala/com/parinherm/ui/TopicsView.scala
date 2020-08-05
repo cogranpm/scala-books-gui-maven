@@ -41,7 +41,8 @@ class TopicsView(val daParent: Composite, val topics: ListBuffer[Topic]) extends
   this.setLayout(new FillLayout(SWT.VERTICAL))
 
 
-  def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI)
+  def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY
+    | SWT.MULTI  | SWT.V_SCROLL)
 
   def createBox(parent: Composite) = {
     val box = new Composite(parent, SWT.BORDER)

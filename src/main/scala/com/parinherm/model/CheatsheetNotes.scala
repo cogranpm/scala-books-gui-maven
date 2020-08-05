@@ -1,5 +1,7 @@
 package com.parinherm.model
 
+import com.parinherm.model.NavigationData.{addLine, createExercises}
+
 import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, StringBuilder}
 
@@ -77,13 +79,6 @@ calling a varargs method with a 'Seq'
   topics += new Topic("Classes", classes,
     createExercises(new Exercise("Demo", fnClasses)))
 
-  def createExercises(exercise: Exercise*) : ListBuffer[Exercise] = {
-    val list = ListBuffer.empty[Exercise]
-    list.addAll(exercise)
-    list
-  }
-
-  def addLine(line: String, buffer: mutable.StringBuilder) = buffer ++= line ++= "\n"
 
   def demoVarsAndMethods ():  String = {
     var output = new mutable.StringBuilder("Begin \n")

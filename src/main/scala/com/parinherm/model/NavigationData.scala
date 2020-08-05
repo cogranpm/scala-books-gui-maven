@@ -1,11 +1,15 @@
 package com.parinherm.model
 
+import com.parinherm.model.twitterguides.EffectiveScala
 import com.parinherm.ui.{BrowserTest, ReferenceDocView, TopicsView}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.{CTabFolder, CTabItem}
 import org.eclipse.swt.events.{SelectionEvent, SelectionListener}
 import org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter
 import org.eclipse.swt.widgets.Composite
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 case class NavigationItem (title: String,  handler: SelectionListener)
 case class NavigationHeader (title: String, items: List[NavigationItem])
@@ -17,8 +21,15 @@ object NavigationData {
     val headers: List[NavigationHeader] = List(createCheatSheets(parentTab),
     createFunctionalProgrammingInScala(parentTab),
     createScalaProgrammingLanguage(parentTab),
-    createBrowserHack(parentTab))
+    createBrowserHack(parentTab),
+    createTwitterGuides(parentTab))
     headers
+  }
+
+  def createTwitterGuides(parentTab: CTabFolder) = {
+    val view = new TopicsView(parentTab, EffectiveScala.topics)
+    val item = NavigationItem("Effective Scala", createTabHandler(parentTab, view, "Effective Scala"))
+    NavigationHeader("Twitter Guides", List(item))
   }
 
   def createBrowserHack(parentTab: CTabFolder) : NavigationHeader = {
@@ -84,4 +95,13 @@ object NavigationData {
     shelfItemHandler
 
   }
+
+  def createExercises(exercise: Exercise*) : ListBuffer[Exercise] = {
+    val list = ListBuffer.empty[Exercise]
+    list.addAll(exercise)
+    list
+  }
+
+  def addLine(line: String, buffer: mutable.StringBuilder) = buffer ++= line ++= "\n"
+
 }
