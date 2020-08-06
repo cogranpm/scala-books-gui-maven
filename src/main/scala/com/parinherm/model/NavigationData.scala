@@ -1,5 +1,6 @@
 package com.parinherm.model
 
+import com.parinherm.model.coursera.Cheatsheet
 import com.parinherm.model.twitterguides.EffectiveScala
 import com.parinherm.ui.{BrowserTest, ReferenceDocView, TopicsView}
 import org.eclipse.swt.SWT
@@ -22,7 +23,8 @@ object NavigationData {
     createFunctionalProgrammingInScala(parentTab),
     createScalaProgrammingLanguage(parentTab),
     createBrowserHack(parentTab),
-    createTwitterGuides(parentTab))
+    createTwitterGuides(parentTab),
+    createCoursera(parentTab))
     headers
   }
 
@@ -38,11 +40,18 @@ object NavigationData {
     NavigationHeader("Utilities", List(item))
   }
 
+  def createCoursera(parentTab: CTabFolder) : NavigationHeader = {
+    val viewCoursera = new TopicsView(parentTab, Cheatsheet.topics)
+    val itemCoursera = NavigationItem("Cheatsheet", createTabHandler(parentTab, viewCoursera, "Cheatsheet" ))
+    val header = NavigationHeader("Coursera", List(itemCoursera))
+    header
+  }
+
  def createCheatSheets(parentTab: CTabFolder) : NavigationHeader = {
    /* cheatsheets */
-   val view = new TopicsView(parentTab, CheatsheetNotes.topics)
-   val item = NavigationItem("Jax", createTabHandler(parentTab, view, "Jax"))
-   val header = NavigationHeader("Cheatsheets", List(item))
+   val viewJax = new TopicsView(parentTab, CheatsheetNotes.topics)
+   val itemJax = NavigationItem("Jax", createTabHandler(parentTab, viewJax, "Jax"))
+   val header = NavigationHeader("Cheatsheets", List(itemJax))
     header
  }
 

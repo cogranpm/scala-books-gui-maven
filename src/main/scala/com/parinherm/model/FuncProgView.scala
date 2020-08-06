@@ -55,6 +55,23 @@ eliminate side effects
       |   case somepattern => expression
       | }
       |
+      | wildcard use _ in the pattern:
+      | case _ => somevalue
+      |
+      | can also use wildcards anywhere in a pattern, say a constructor pattern
+      | case Person(firstName, _) => firstName
+      |
+      | if no cases match, there will be a MatchError at runtime
+      |
+      | Companion Object
+      | it is customary to supply one of these for a custom type
+      | that takes a varargs parameter, to allow users to conveniently
+      | construct instances of the type in tricky ways, for example
+      | if you have a collection datastructure, and a user passes
+      | two lists to a constructor, you might concatenate the two lists
+      | into an instance of your type
+      |
+      |
       |""".stripMargin
 
   val exercises = ListBuffer.empty[Exercise]

@@ -1,5 +1,9 @@
 package com.parinherm.model.datastructures
 
+import com.parinherm.model.NavigationData.addLine
+
+import scala.collection.mutable
+
 /*
 example in functional programming in Scala
  */
@@ -46,8 +50,11 @@ object demoList {
   val ex3: List[String] = Cons("a", Cons("b", Nil))
 
   def run() : String = {
-
-    "I ran"
+    val output = new mutable.StringBuilder("Begin \n")
+    addLine( s"sum: ${List.product(ex1)}", output)
+    //addLine( s"sum: ${List.product(ex2)}", output)
+    //addLine( s"sum: ${List.product(ex3)}", output)
+    output.toString()
   }
 }
 
