@@ -1,5 +1,8 @@
 package com.parinherm.model
 
+import com.parinherm.model.NavigationData.createExercises
+import com.parinherm.model.datastructures.demoList
+
 import scala.collection.mutable.ListBuffer
 
 
@@ -39,18 +42,29 @@ eliminate side effects
       | }
       |""".stripMargin
 
-  // there are many exercises per topic, associate via the topic key
-  val exercises = ListBuffer.empty[Exercise]
-  val testFunction: () => String = ()  => "running a function"
-  val differentFunction: () => String = () => "running a diffferent function"
-  exercises += new Exercise("Functions",  testFunction)
-  exercises += new Exercise("Currying", differentFunction)
+  val fds =
+    """
+      | it's a conventions to use xs, ys, as or bs as variable names
+      | for  sequence of some sort and x, y, z, a or b as the name
+      | for a single element of a sequence. Also h is for first element of a list
+      | (head) and t for the remaining (tail), l is for the entire list
+      |
+      | variadic function has argument type followed by *
+      | : _* is the splat operator, transforms a seq into individual arguments
+      | pattern match: somevalue match {
+      |   case somepattern => expression
+      | }
+      |
+      |""".stripMargin
 
+  val exercises = ListBuffer.empty[Exercise]
 
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("First Example", firstExample, ListBuffer.empty)
   topics += new Topic("Introducing Scala", introducingScala,  exercises)
   topics += new Topic("Strictness and Laziness", functionsHelp, exercises)
+  topics += new Topic("Functional Data Structures", fds,
+    createExercises(new Exercise("Demo",  demoList.run)))
 
 
 }

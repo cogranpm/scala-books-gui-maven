@@ -11,7 +11,7 @@ import org.eclipse.jface.databinding.swt.typed.WidgetProperties
 import org.eclipse.jface.databinding.viewers.ViewerSupport
 import org.eclipse.jface.databinding.viewers.typed.ViewerProperties
 import org.eclipse.jface.layout.{GridDataFactory, GridLayoutFactory}
-import org.eclipse.jface.viewers.{ISelectionChangedListener, ListViewer, SelectionChangedEvent, TableViewer, TableViewerColumn}
+import org.eclipse.jface.viewers.{ColumnWeightData, ISelectionChangedListener, ListViewer, SelectionChangedEvent, TableLayout, TableViewer, TableViewerColumn}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.SashForm
 import org.eclipse.swt.layout.FillLayout
@@ -73,11 +73,15 @@ class TopicsView(val daParent: Composite, val topics: ListBuffer[Topic]) extends
   def createListBox(parent: Composite): Composite = {
     val listBox: Composite = new Composite(parent, SWT.NONE)
     listBox.setLayout(new FillLayout(SWT.VERTICAL))
+
+    val tl = new TableLayout()
+    tl.addColumnData(new ColumnWeightData(1))
     viewer = new TableViewer(listBox)
     val column = new TableViewerColumn(viewer, SWT.NONE)
     column.getColumn().setWidth(100)
     column.getColumn().setText("Title")
     viewer.getTable().setHeaderVisible(true)
+    viewer.getTable().setLayout(tl)
     val input: WritableList[Topic] = WritableList.withElementType(classOf[Topic])
     //input.add(new Exercise("Trying"))
     input.addAll(topics.asJavaCollection)
