@@ -70,10 +70,77 @@ object EffectiveScala {
       |
       |""".stripMargin
 
+
+  val concurrency =
+    """
+      | use Futures to manage concurrency
+      | don't throw exceptions in methods that return Futures
+      | return Future.exception instead
+      |""".stripMargin
+
+
+  val functional =
+    """
+      | case classes, pattern matching, destructuring bindings, type inference
+      | lightweight closure and method creation syntax are the tools
+      | Case Classes:
+      | encode ADTs with following pattern:
+      |   sealed trait Tree[T]
+      |   case class Node[T] (left: Tree[T], right: Tree[T]) extends Tree[T]
+      |   case class Leaf[T] (value: T) extends Tree[T]
+      | all declared in the same file, allows match exhaustivity
+      |
+      | use Option type for null possibilities
+      | use foreach to operator on them if only interested in non null bit
+      | opt foreach { value =>
+      |   operate(value)
+      | }
+      |
+      | use match if interested in both sides
+      | opt match {
+      |   case Some(value) => operate(value)
+      |   case None => defaultAction()
+      |   }
+      |
+      | if just need default value, use getOrElse
+      | operate(opt getOrElse defaultValue)
+      |
+      | use the Option constructor when calling method that may return null:
+      | Option(getClass.getResourceAsStream("foo"))
+      | will return Option[InputStream] will be None if inside call returns null
+      |
+      |  Pattern Matching:
+      |  For type switches
+      |  obj match {
+      |    case str: String => ...
+      |    case addr: SocketAddress = ...
+      |
+      |  Destructuring
+      |  don't do this one:
+      |  animal match {
+      |    case dog: Dog => println(dog.breed)
+      |    case _ => animal.species
+      |
+      | instead:
+      |   case Dog(breed) => println(breed)
+      |   case other => other.species
+      |
+      |
+      |""".stripMargin
+
+
+  val garbage =
+    """
+      | Twitter has tools for profiling: heapster and gcprof
+      |""".stripMargin
+
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("Formatting", formattingNotes, ListBuffer.empty[Exercise])
   topics += new Topic( "Types and Generics", typesAndGenerics, ListBuffer.empty)
   topics += new Topic("Collections", collections, ListBuffer.empty)
+  topics += new Topic("Concurrency", collections, ListBuffer.empty)
+  topics += new Topic("Functional Programming", functional, ListBuffer.empty)
+  topics += new Topic("Garbage Collection", garbage, ListBuffer.empty)
 
 }
 
