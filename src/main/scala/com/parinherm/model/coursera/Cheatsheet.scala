@@ -256,7 +256,26 @@ object Cheatsheet {
       |  val s = "hello world"
       |  s filter (c => c.isupper) // returns HW
       |
+      | Operations on Lists:
       |  val xs = List(...)
+      |  xs.length
+      |  xs.last
+      |  xs.init  //all but last
+      |  xs take n  //first n elements
+      |  xs drop n  //rest are n elements
+      |  xs(n)  // nth element
+      |  xs ++ ys
+      |  xs.reverse
+      |  xs updated(n, x) // changes item at x and returns new list
+      |  xs indexOf x
+      |  xs contains x
+      |  xs filter p
+      |  xs filterNot p
+      |  xs partition p
+      |  xs takeWhile p
+      |  xs dropWhile p
+      |  xs span p
+      |
       |
       |
       |
