@@ -145,8 +145,19 @@ object Cheatsheet {
       |
       |""".stripMargin
 
+  val notesPatterns =
+    """
+      | unknownObject match {
+      |   case MyClass(n) => ...
+      |   case MyClass2(a, b) => ...
+      | }
+      |
+      |
+      |""".stripMargin
+
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("Basics", notesBasics, ListBuffer.empty[Exercise])
   topics += new Topic("OO", notesOO, ListBuffer.empty)
+  topics += new Topic("Pattern Matching", notesPatterns, ListBuffer.empty)
 
 }

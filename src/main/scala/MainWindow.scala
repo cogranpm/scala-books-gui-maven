@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
 
+
 class MainWindow extends ApplicationWindow(null) {
 
   addToolBar(SWT.FLAT | SWT.WRAP)
