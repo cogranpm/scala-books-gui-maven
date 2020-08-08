@@ -1,5 +1,6 @@
 package com.parinherm.model.coursera
 
+import com.parinherm.model.NavigationData.{addLine, createExercises}
 import com.parinherm.model.{Exercise, Topic}
 
 import scala.collection.mutable.ListBuffer
@@ -152,12 +153,134 @@ object Cheatsheet {
       |   case MyClass2(a, b) => ...
       | }
       |
+      | (someList: List[T]) match {
+      |  case Nil => ...   //empty list
+      |  case x :: Nil => ... // list with only one element
+      |  case List(x) => ... // same as above
+      |  case x :: xs => .. list with at least 1 element, x is bound to the head
+      |  xs to the tail, xs could be Nil or some other list
+      |  case 1 :: 2 :: cs => ... // list starts with 1 and then 2
+      |  case (x, y) :: ps => ... //a list where head element is a pair
+      |  case _ => ... // wildcard
+      |
+      |  Options:
+      |  val myMap = Map("a" -> 42, "b" -> 43)
+      |  def getMapValue(s: String): String = {
+      |    myMap get s match {
+      |      case Some(nb) => "value found: " + nb
+      |      case None => "No value found"
+      |    }
+      |  }
+      |
+      |  getMapValue("a")
+      |  getMapValue("c")
+      |
+      |  // easiest to just use getOrElse on an option value
+      |  def getMapValue(s: String): String =
+      |    // map.get returns an Option
+      |    // Option is a container so you can use map on it
+      |    // map takes a function parameter, so you can use a wildcard
+      |    // in scala you can omit the left side of the lambda, so in this case
+      |    // you see just the return value, a string
+      |    // map on options, if value is present applies the function
+      |    // and returns a Some with result of function
+      |    // otherwise if None returns it and does not apply function
+      |    myMap.get(s).map("Value found: " + _).getOrElse("No value found")
+      |
+      |  Pattern Matching in Anonymous Functions
+      |  val pairs: List[(Char, Int)] = ('a', 2) :: ('b', 3) :: Nil
+      |  val chars: List[Char] = pairs.map(p => p match {
+      |     case (ch, num) => ch
+      |     })
+      |
+      |   // can leave out the match bit
+      |   val chars: List[Char] = pairs.map {
+      |     case (ch, num) => ch
+      |     }
+      |
+      |
+      |
+      |
       |
       |""".stripMargin
+
+  val notesCollections =
+    """
+      | Collections:
+      | Base classes:
+      |   Iterable
+      |   Seq
+      |   Set
+      |   Map
+      |
+      | Immutables:
+      |   List - fast sequential
+      |   Stream - tail evaluated only on demand
+      |   Vector - fast random access
+      |   Range
+      |   String - can treat as Seq[Char]
+      |   Map
+      |   Set
+      |
+      | Mutables:
+      |  Array - native java arrays
+      |  Map
+      |  Set
+      |
+      |  Examples:
+      |
+      |  val fruitList = List("apples", "oranges", "pears")
+      |  val fruit = "apples" :: ("oranges" :: ("pears" :: Nil))  //:: is right associative
+      |  // which means that you push the right side argument to the left and call .::(leftside) on it
+      |  eg: Nil.::("pears") // :: is a method on List
+      |
+      |  fruit.head
+      |  fruit.tail // a list after first item
+      |  val empty = List()
+      |  val empty = Nil
+      |
+      |  val nums = Vector("Louis", "frank", "hiromi")
+      |  nums(1)
+      |  nums.updated(2, "helena") // returns new vector with changed value at index
+      |
+      |  val fruitSet = Set("apple", "banana", "pear", "banana")
+      |  fruitSet.size //no duplicates
+      |
+      |  val r: Range = 1 until 5
+      |  val s: Range = 1 to 5
+      |  1 to 10 by 3
+      |  6 to 1 by -2
+      |  val s = (1 to 6).toSet
+      |  s map (_ + 2) //adds 2 to each element in set
+      |
+      |  val s = "hello world"
+      |  s filter (c => c.isupper) // returns HW
+      |
+      |  val xs = List(...)
+      |
+      |
+      |
+      |
+      |""".stripMargin
+
+  def collections() : String = {
+    val output = new StringBuilder("")
+    addLine("Collections", output)
+
+   val empty = List()
+
+    val seqTest = Seq[Int](1, 2, 3)
+    addLine(seqTest(0).toString, output)
+    addLine(seqTest.last.toString, output)
+    addLine("****************************************", output)
+    output.toString()
+  }
 
   val topics = ListBuffer.empty[Topic]
   topics += new Topic("Basics", notesBasics, ListBuffer.empty[Exercise])
   topics += new Topic("OO", notesOO, ListBuffer.empty)
   topics += new Topic("Pattern Matching", notesPatterns, ListBuffer.empty)
+  topics += new Topic( "Collections", notesCollections,
+    createExercises(new Exercise("Demo", collections)) )
 
 }
