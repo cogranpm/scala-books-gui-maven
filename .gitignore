@@ -2,3 +2,6 @@
 /target/
 /scala-books-gui-maven.iml
 /lwt-teachers/
+/.metals/metals.h2.db
+/.metals/metals.lock.db
+/.metals/metals.log
