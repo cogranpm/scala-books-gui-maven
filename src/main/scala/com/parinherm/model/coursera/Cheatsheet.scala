@@ -2,22 +2,15 @@ package com.parinherm.model.coursera
 
 import com.parinherm.model.NavigationData.{addLine, createExercises}
 import com.parinherm.model.{Exercise, Topic}
+import com.parinherm.services.HttpClientService
 
 import scala.collection.mutable.ListBuffer
 
 
-/*using finagle as http client for demos
-import com.twitter.finagle.{Http, Service}
-import com.twitter.finagle.http
-import com.twitter.util.{Await, Future}
 
- */
+import play.api.libs.json._
 
-import scalaj.http._
 
-/* json parsing library */
-import spray.json._
-import DefaultJsonProtocol._
 
 object Cheatsheet {
 
@@ -358,30 +351,65 @@ object Cheatsheet {
       |
       |""".stripMargin
 
+
+  def testHuffingtonPost(): String = {
+    val output = new StringBuilder()
+    val requestBaseUrl = "https://elections.huffingtonpost.com/pollster/api/v2/"
+    val requestUrl = requestBaseUrl + "questions.json"
+    val json = HttpClientService.getDataFromUrl(requestUrl)
+    json match {
+      case Some(theData) => {
+        val items = (theData \ "items").as[List[JsValue]]
+        //items is a list of questions
+        items.foreach({
+          item => {
+            val name = (item \ "name").as[String]
+            addLine(name, output)
+            val responses = (item \ "responses").as[List[JsValue]]
+            responses.foreach({
+              response => addLine((response \ "name").as[String], output)
+            })
+          }
+        })
+      }
+      case _ => addLine("Error", output)
+    }
+    output.toString()
+
+  }
+
   def collections() : String = {
     val output = new StringBuilder("")
     addLine("Collections", output)
+    //addLine(testHuffingtonPost(), output)
+
+    val healthDataUrl = "https://data.sfgov.org/resource/pyih-qa8i.json"
+    //"https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Food_Inspections/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+    val hrep: Option[JsValue] = HttpClientService.getDataFromUrl(healthDataUrl)
+    hrep match {
+      case Some(theData) => {
+        addLine(theData.toString(), output)
+        /*
+        val bizName = (theData \ "business_name").as[String]
+        val vio = (theData \ "violation_description").as[String]
+        addLine(s"Name: $bizName  Violation: $vio", output)
+
+         */
+      }
+      case _ => addLine("Error", output)
+    }
+   /*
+    val healthDataJson = HttpClientService.getDataFromUrl(healthDataUrl)
+    addLine(healthDataJson.toString(), output)
+     */
+    //addLine(HttpClientService.getDataFromUrlAsync(healthDataUrl), output)
 
 
-    System.setProperty("sun.net.http.allowRestrictedHeaders", "true")
-    //val requestUrl = "http://date.jsontest.com/"
-    var requestBaseUrl = "https://elections.huffingtonpost.com/pollster/api/v2/"
-    val requestUrl = requestBaseUrl + "questions.json"
-    val request: HttpRequest = Http(requestUrl)
-    val body = request.asString.body
-    //addLine(body, output)
-    val jsonAst = JsonParser(body)
-    addLine(jsonAst.prettyPrint, output)
+    //val jsonAst = JsonParser(body)
+    //addLine(jsonAst.prettyPrint, output)
 
 
-/*    val client: Service[http.Request, http.Response] = Http.newService("www.scala-lang.org:80")
-    val request = http.Request(http.Method.Get, "/")
-    request.host = "www.scala-lang.org"
-    val response: Future[http.Response] = client(request)
-    Await.result(response.onSuccess{
-      rep: http.Response => addLine("Success" + rep, output)
-    })
-
+/*
  */
 
    val empty = List()
