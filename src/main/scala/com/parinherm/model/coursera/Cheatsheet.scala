@@ -15,6 +15,10 @@ import com.twitter.util.{Await, Future}
 
 import scalaj.http._
 
+/* json parsing library */
+import spray.json._
+import DefaultJsonProtocol._
+
 object Cheatsheet {
 
   val notesBasics =
@@ -361,9 +365,14 @@ object Cheatsheet {
 
     System.setProperty("sun.net.http.allowRestrictedHeaders", "true")
     //val requestUrl = "http://date.jsontest.com/"
-    val requestUrl = "https://elections.huffingtonpost.com/pollster/api/v2/charts.json"
+    var requestBaseUrl = "https://elections.huffingtonpost.com/pollster/api/v2/"
+    val requestUrl = requestBaseUrl + "questions.json"
     val request: HttpRequest = Http(requestUrl)
-    addLine(request.asString.body, output)
+    val body = request.asString.body
+    //addLine(body, output)
+    val jsonAst = JsonParser(body)
+    addLine(jsonAst.prettyPrint, output)
+
 
 /*    val client: Service[http.Request, http.Response] = Http.newService("www.scala-lang.org:80")
     val request = http.Request(http.Method.Get, "/")

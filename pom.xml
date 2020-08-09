@@ -244,6 +244,14 @@
     </dependency>
 
 
+    <!-- akka http uses this for json -->
+    <dependency>
+      <groupId>com.softwaremill.sttp.client</groupId>
+      <artifactId>spray-json_2.13</artifactId>
+      <version>2.2.4</version>
+    </dependency>
+
+
   </dependencies>
 
   <dependencyManagement>
