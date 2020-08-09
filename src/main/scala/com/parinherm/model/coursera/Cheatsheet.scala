@@ -274,7 +274,44 @@ object Cheatsheet {
       |  xs partition p
       |  xs takeWhile p
       |  xs dropWhile p
-      |  xs span p
+      |  xs span p  // same as (xs takeWhile p, xs dropWhile p)
+      |
+      |  List(x1, ..., xn) reduceLeft op  //applies op to each item pair in order
+      |  List(x1, ..., xn).foldLeft(z)(op) // first applies op to z and first item, then to x2
+      |  List(x1, ..., xn) reduceRight op // hmmmm
+      |  List(x1, ..., xn).foldRight(z)(op) //
+      |
+      | xs exists p
+      | xs forall p // true if p(item) true for all items
+      | xs zip ys  // returns a list of pairs which groups elements with same index together
+      | xs unzip  // returns a pair of two lists
+      | xs.flatMap f //applies function to all elements and concatenates the result
+      | xs.sum  //sum of element of numeric collection
+      | xs.product
+      | xs.max
+      | xs.min
+      | xs.flatten  //flattens collection of collection into single level
+      | xs groupBy f // returns a map which points to a list of elementss
+      | xs distinct  // removes duplicates
+      |
+      |   x +: xs // creates a new collection with leading element x
+      |   xs :+ x // creates a new collection with a trailing element x
+      |
+      |   Operations on Maps:
+      |   val myMap = Map("I" -> 1, "V" -> 5, "X" -> 10)
+      |   myMap("I")
+      |   myMap("A") // java.util.NoSuchElementException
+      |   myMap get "A" // None
+      |   myMap get "I" // Some(1)
+      |   myMap.updated("V", 15)
+      |
+      |   Operatoins on Streams (note: streams a lazy lists):
+      |   val xs = Stream(1, 2, 3)
+      |   val xs = Stream.cons(1, Stream.cons(2, Stream.cons(3, Stream.empty))) // same as above
+      |   (1 to 1000).toStream  // Stream(1, ?)
+      |   x #:: xs // same as stream.cons
+      |
+      |   Pairs:
       |
       |
       |
