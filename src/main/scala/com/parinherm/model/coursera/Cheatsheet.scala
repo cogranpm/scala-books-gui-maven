@@ -381,6 +381,7 @@ object Cheatsheet {
   def collections() : String = {
     val output = new StringBuilder("")
     addLine("Collections", output)
+    addLine("*************************", output)
     //addLine(testHuffingtonPost(), output)
 
     val healthDataUrl = "https://data.sfgov.org/resource/pyih-qa8i.json"
@@ -388,13 +389,19 @@ object Cheatsheet {
     val hrep: Option[JsValue] = HttpClientService.getDataFromUrl(healthDataUrl)
     hrep match {
       case Some(theData) => {
-        addLine(theData.toString(), output)
-        /*
-        val bizName = (theData \ "business_name").as[String]
-        val vio = (theData \ "violation_description").as[String]
-        addLine(s"Name: $bizName  Violation: $vio", output)
-
-         */
+        //addLine(theData.toString(), output)
+        val items = (theData).as[List[JsValue]]
+        items.foreach({
+          item => {
+            val bizName = (item \ "business_name").as[String]
+            val vio = (item \ "violation_description").validate[String]
+            val vioDescription = vio match {
+              case JsSuccess(viod, _) => viod
+              case e: JsError => "No Description"
+            }
+            addLine(s"Name: $bizName  Violation: $vioDescription", output)
+          }
+        })
       }
       case _ => addLine("Error", output)
     }
