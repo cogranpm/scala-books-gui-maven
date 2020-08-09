@@ -42,7 +42,7 @@ class TopicsView(val daParent: Composite, val topics: ListBuffer[Topic]) extends
 
 
   def createReadOnlyLabel(parent: Composite) = new Text(parent, SWT.BORDER | SWT.READ_ONLY
-    | SWT.MULTI  | SWT.V_SCROLL)
+    | SWT.MULTI  | SWT.V_SCROLL | SWT.WRAP)
 
   def createBox(parent: Composite) = {
     val box = new Composite(parent, SWT.BORDER)

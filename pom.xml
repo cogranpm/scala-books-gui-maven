@@ -210,6 +210,40 @@
     </dependency>
 
 
+    <!-- http client attempt so test out loading government data etc
+    relies on the dreaded slf4j library
+    -->
+    <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>finagle-http_2.13</artifactId>
+      <version>20.7.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.11.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.11.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.11.1</version>
+    </dependency>
+
+
+    <!-- alternative http client to try -->
+    <dependency>
+      <groupId>org.scalaj</groupId>
+      <artifactId>scalaj-http_2.13</artifactId>
+      <version>2.4.2</version>
+    </dependency>
+
+
   </dependencies>
 
   <dependencyManagement>

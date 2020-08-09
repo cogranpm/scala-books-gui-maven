@@ -5,6 +5,16 @@ import com.parinherm.model.{Exercise, Topic}
 
 import scala.collection.mutable.ListBuffer
 
+
+/*using finagle as http client for demos
+import com.twitter.finagle.{Http, Service}
+import com.twitter.finagle.http
+import com.twitter.util.{Await, Future}
+
+ */
+
+import scalaj.http._
+
 object Cheatsheet {
 
   val notesBasics =
@@ -312,8 +322,33 @@ object Cheatsheet {
       |   x #:: xs // same as stream.cons
       |
       |   Pairs:
+      |   val pair = ("answer", 42)  // type: (String, Int)
+      |   val (label, value) = pair   // deconstruct
+      |   pair._1
+      |   pair._2
       |
+      |   Ordering:
+      |   import math.Ordering
       |
+      |   def msort[T](xs: List[T])(implicit ord: Ordering) = { ... }
+      |   msort(fruits)(Ordering.String)
+      |   msort(fruits) // compiler figures out right ordering
+      |
+      | For Comprehensions:
+      | syntactic sugar for map, flatMap and filter operations on collections
+      | General Form: for (s) yield e
+      |   for (x <- 1 to M; y <- 1 to N)
+      |     yield (x, y)
+      |
+      | which is eqivalent to:
+      |   (1 to M) flatMap (x => (1 to N) map (y => (x, y)))
+      |
+      | another example:
+      |   for {
+      |     i <- 1 until n
+      |     j <- 1 until i
+      |     if isPrime(i + j)
+      |   } yield (i, j)
       |
       |
       |
@@ -322,6 +357,23 @@ object Cheatsheet {
   def collections() : String = {
     val output = new StringBuilder("")
     addLine("Collections", output)
+
+
+    System.setProperty("sun.net.http.allowRestrictedHeaders", "true")
+    //val requestUrl = "http://date.jsontest.com/"
+    val requestUrl = "https://elections.huffingtonpost.com/pollster/api/v2/charts.json"
+    val request: HttpRequest = Http(requestUrl)
+    addLine(request.asString.body, output)
+
+/*    val client: Service[http.Request, http.Response] = Http.newService("www.scala-lang.org:80")
+    val request = http.Request(http.Method.Get, "/")
+    request.host = "www.scala-lang.org"
+    val response: Future[http.Response] = client(request)
+    Await.result(response.onSuccess{
+      rep: http.Response => addLine("Success" + rep, output)
+    })
+
+ */
 
    val empty = List()
 
