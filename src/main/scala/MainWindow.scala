@@ -111,10 +111,14 @@ class MainWindow extends ApplicationWindow(null) {
   override def configureShell(shell: Shell): Unit = {
     super.configureShell(shell)
     shell.setText("Kernai")
+    shell.setMaximized(true)
 
   }
 
-  override def getInitialSize: Point = new Point(900, 900)
+  override def getInitialSize: Point = {
+    val clientRect = getShell.getDisplay.getPrimaryMonitor.getClientArea
+    new Point(clientRect.width, clientRect.height)
+  }
 
 
   def createReferenceButtons(): Unit = {

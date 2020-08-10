@@ -351,6 +351,13 @@ object Cheatsheet {
       |
       |""".stripMargin
 
+  def getValidatedJsonFieldValue(field: JsResult[String]): String = {
+    field match {
+      case JsSuccess(rawData, _) => rawData.toString
+      case e: JsError => "No Description"
+    }
+
+  }
 
   def testHuffingtonPost(): String = {
     val output = new StringBuilder()
@@ -378,12 +385,43 @@ object Cheatsheet {
 
   }
 
-  def collections() : String = {
-    val output = new StringBuilder("")
-    addLine("Collections", output)
-    addLine("*************************", output)
-    //addLine(testHuffingtonPost(), output)
+ def testPoliceData(): String = {
+   val output = new StringBuilder()
+   //val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2017/FeatureServer/0/query?where=1%3D1&outFields=PublicAddress,Precinct,ReportedDate,BeginDate,Time,Offense,Description,EnteredDate,Neighborhood,LastUpdateDate&returnGeometry=false&outSR=4326&f=json"
+   val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2019/FeatureServer/0/query?where=1%3D1&outFields=publicaddress,reportedDate,reportedTime,offense,description,neighborhood&returnGeometry=false&outSR=4326&f=json"
 
+   val json = HttpClientService.getDataFromUrl(url)
+   json match {
+     case Some(theData) => {
+       val items = (theData \ "features").as[List[JsValue]]
+       items.foreach({
+         item => {
+           addLine(item.toString(), output)
+           /*
+           val attributes = (item \ "attributes")
+           val address = (attributes \ "publicaddress").validate[String]
+           val addressData = getValidatedJsonFieldValue(address)
+           val offense =  getValidatedJsonFieldValue((attributes \ "offense").validate[String])
+           val description =  getValidatedJsonFieldValue((attributes \ "description").validate[String])
+           val neighborhood =  getValidatedJsonFieldValue((attributes \ "neighborhood").validate[String])
+           addLine(s"Address: $addressData Offense: $offense Description: $description Neighborhood: $neighborhood", output)
+
+            */
+         }
+       })
+
+
+     }
+
+
+     case _ => addLine("Error", output)
+   }
+   output.toString()
+
+ }
+
+  def testHealthData() : String = {
+    val output = new StringBuilder()
     val healthDataUrl = "https://data.sfgov.org/resource/pyih-qa8i.json"
     //"https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Food_Inspections/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
     val hrep: Option[JsValue] = HttpClientService.getDataFromUrl(healthDataUrl)
@@ -405,25 +443,15 @@ object Cheatsheet {
       }
       case _ => addLine("Error", output)
     }
-   /*
-    val healthDataJson = HttpClientService.getDataFromUrl(healthDataUrl)
-    addLine(healthDataJson.toString(), output)
-     */
-    //addLine(HttpClientService.getDataFromUrlAsync(healthDataUrl), output)
+    output.toString()
+  }
 
+  def collections() : String = {
+    val output = new StringBuilder("")
+    addLine("Collections", output)
+    addLine("*************************", output)
+    addLine(testPoliceData(), output)
 
-    //val jsonAst = JsonParser(body)
-    //addLine(jsonAst.prettyPrint, output)
-
-
-/*
- */
-
-   val empty = List()
-
-    val seqTest = Seq[Int](1, 2, 3)
-    addLine(seqTest(0).toString, output)
-    addLine(seqTest.last.toString, output)
     addLine("****************************************", output)
     output.toString()
   }
