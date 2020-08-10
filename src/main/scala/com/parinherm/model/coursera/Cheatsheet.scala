@@ -387,35 +387,49 @@ object Cheatsheet {
 
  def testPoliceData(): String = {
    val output = new StringBuilder()
-   //val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2017/FeatureServer/0/query?where=1%3D1&outFields=PublicAddress,Precinct,ReportedDate,BeginDate,Time,Offense,Description,EnteredDate,Neighborhood,LastUpdateDate&returnGeometry=false&outSR=4326&f=json"
-   val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2019/FeatureServer/0/query?where=1%3D1&outFields=publicaddress,reportedDate,reportedTime,offense,description,neighborhood&returnGeometry=false&outSR=4326&f=json"
+   val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2017/FeatureServer/0/query?where=1%3D1&outFields=PublicAddress,Precinct,ReportedDate,BeginDate,Time,Offense,Description,EnteredDate,Neighborhood,LastUpdateDate&returnGeometry=false&outSR=4326&f=json"
+   //val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2019/FeatureServer/0/query?where=1%3D1&outFields=publicaddress,reportedDate,reportedTime,offense,description,neighborhood&returnGeometry=false&outSR=4326&f=json"
 
    val json = HttpClientService.getDataFromUrl(url)
-   json match {
-     case Some(theData) => {
-       val items = (theData \ "features").as[List[JsValue]]
-       items.foreach({
-         item => {
-           addLine(item.toString(), output)
-           /*
-           val attributes = (item \ "attributes")
-           val address = (attributes \ "publicaddress").validate[String]
-           val addressData = getValidatedJsonFieldValue(address)
-           val offense =  getValidatedJsonFieldValue((attributes \ "offense").validate[String])
-           val description =  getValidatedJsonFieldValue((attributes \ "description").validate[String])
-           val neighborhood =  getValidatedJsonFieldValue((attributes \ "neighborhood").validate[String])
-           addLine(s"Address: $addressData Offense: $offense Description: $description Neighborhood: $neighborhood", output)
 
-            */
-         }
-       })
-
-
-     }
-
-
-     case _ => addLine("Error", output)
+   // match to extract error free value
+   val dataItems: List[JsValue] = json match {
+      case Some(theData) => (theData \ "features").as[List[JsValue]]
+      case _ => List[JsValue]()
    }
+
+   // create a list of maps for the data
+   val entities = dataItems.map(x => {
+     val attributes = (x \ "attributes")
+     val address = getValidatedJsonFieldValue((attributes \ "PublicAddress").validate[String])
+     val offense =  getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
+     val description =  getValidatedJsonFieldValue((attributes \ "Description").validate[String])
+     val neighborhood =  getValidatedJsonFieldValue((attributes \ "Neighborhood").validate[String])
+     Map("address" -> address, "offense" -> offense,
+       "description" -> description, "neighborhood" -> neighborhood)
+   })
+   entities.foreach( x => {
+     val addr = s"Address: ${x.getOrElse("address", "")} "
+     val offense = s"Offense: ${x.getOrElse("offense", "")} "
+     val desc = s"Desc: ${x.getOrElse("description", "")} "
+     val neigh = s"Neighborhood: ${x.getOrElse("neighborhood", "")} "
+     addLine(addr + offense + desc + neigh, output)
+   })
+
+   /*
+items.foreach({
+  item => {
+    val attributes = (item \ "attributes")
+    val address = (attributes \ "PublicAddress").validate[String]
+    val addressData = getValidatedJsonFieldValue(address)
+    val offense =  getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
+    val description =  getValidatedJsonFieldValue((attributes \ "Description").validate[String])
+    val neighborhood =  getValidatedJsonFieldValue((attributes \ "Neighborhood").validate[String])
+    addLine(s"Address: $addressData Offense: $offense Description: $description Neighborhood: $neighborhood", output)
+  }
+})
+ */
+
    output.toString()
 
  }
