@@ -11,7 +11,6 @@ import scala.collection.mutable.ListBuffer
 import play.api.libs.json._
 
 
-
 object Cheatsheet {
 
   val notesBasics =
@@ -399,7 +398,7 @@ object Cheatsheet {
    }
 
    // create a list of maps for the data
-   val entities = dataItems.map(x => {
+   val entities: List[Map[String, String]] = dataItems.map(x => {
      val attributes = (x \ "attributes")
      val address = getValidatedJsonFieldValue((attributes \ "PublicAddress").validate[String])
      val offense =  getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
@@ -408,6 +407,8 @@ object Cheatsheet {
      Map("address" -> address, "offense" -> offense,
        "description" -> description, "neighborhood" -> neighborhood)
    })
+
+
    entities.foreach( x => {
      val addr = s"Address: ${x.getOrElse("address", "")} "
      val offense = s"Offense: ${x.getOrElse("offense", "")} "
@@ -416,20 +417,12 @@ object Cheatsheet {
      addLine(addr + offense + desc + neigh, output)
    })
 
-   /*
-items.foreach({
-  item => {
-    val attributes = (item \ "attributes")
-    val address = (attributes \ "PublicAddress").validate[String]
-    val addressData = getValidatedJsonFieldValue(address)
-    val offense =  getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
-    val description =  getValidatedJsonFieldValue((attributes \ "Description").validate[String])
-    val neighborhood =  getValidatedJsonFieldValue((attributes \ "Neighborhood").validate[String])
-    addLine(s"Address: $addressData Offense: $offense Description: $description Neighborhood: $neighborhood", output)
-  }
-})
- */
+   val vec : Vector[Map[String, String]] = entities.toVector
+   addLine("converted list to vector using .toVector", output)
+   vec.foreach(x => {
+     val address = x.getOrElse("address", "") 
 
+   })
    output.toString()
 
  }
