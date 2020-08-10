@@ -1,15 +1,13 @@
 package com.parinherm.model.coursera
 
-import com.parinherm.model.NavigationData.{addLine, createExercises}
+import com.parinherm.model.NavigationData.{addLine, createExercises, lineSplitter}
 import com.parinherm.model.{Exercise, Topic}
 import com.parinherm.services.HttpClientService
 
 import scala.collection.mutable.ListBuffer
-
-
+import scala.collection.immutable.ListMap
 
 import play.api.libs.json._
-
 
 object Cheatsheet {
 
@@ -353,7 +351,7 @@ object Cheatsheet {
   def getValidatedJsonFieldValue(field: JsResult[String]): String = {
     field match {
       case JsSuccess(rawData, _) => rawData.toString
-      case e: JsError => "No Description"
+      case e: JsError            => "No Description"
     }
 
   }
@@ -367,13 +365,13 @@ object Cheatsheet {
       case Some(theData) => {
         val items = (theData \ "items").as[List[JsValue]]
         //items is a list of questions
-        items.foreach({
-          item => {
+        items.foreach({ item =>
+          {
             val name = (item \ "name").as[String]
             addLine(name, output)
             val responses = (item \ "responses").as[List[JsValue]]
-            responses.foreach({
-              response => addLine((response \ "name").as[String], output)
+            responses.foreach({ response =>
+              addLine((response \ "name").as[String], output)
             })
           }
         })
@@ -384,50 +382,99 @@ object Cheatsheet {
 
   }
 
- def testPoliceData(): String = {
-   val output = new StringBuilder()
-   val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2017/FeatureServer/0/query?where=1%3D1&outFields=PublicAddress,Precinct,ReportedDate,BeginDate,Time,Offense,Description,EnteredDate,Neighborhood,LastUpdateDate&returnGeometry=false&outSR=4326&f=json"
-   //val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2019/FeatureServer/0/query?where=1%3D1&outFields=publicaddress,reportedDate,reportedTime,offense,description,neighborhood&returnGeometry=false&outSR=4326&f=json"
+  def testPoliceData(): String = {
+    val output = new StringBuilder()
+    val url =
+      "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2017/FeatureServer/0/query?where=1%3D1&outFields=PublicAddress,Precinct,ReportedDate,BeginDate,Time,Offense,Description,EnteredDate,Neighborhood,LastUpdateDate&returnGeometry=false&outSR=4326&f=json"
+    //val url = "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Police_Incidents_2019/FeatureServer/0/query?where=1%3D1&outFields=publicaddress,reportedDate,reportedTime,offense,description,neighborhood&returnGeometry=false&outSR=4326&f=json"
 
-   val json = HttpClientService.getDataFromUrl(url)
+    val json = HttpClientService.getDataFromUrl(url)
 
-   // match to extract error free value
-   val dataItems: List[JsValue] = json match {
+    // match to extract error free value
+    val dataItems: List[JsValue] = json match {
       case Some(theData) => (theData \ "features").as[List[JsValue]]
-      case _ => List[JsValue]()
-   }
+      case _             => List[JsValue]()
+    }
 
-   // create a list of maps for the data
-   val entities: List[Map[String, String]] = dataItems.map(x => {
-     val attributes = (x \ "attributes")
-     val address = getValidatedJsonFieldValue((attributes \ "PublicAddress").validate[String])
-     val offense =  getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
-     val description =  getValidatedJsonFieldValue((attributes \ "Description").validate[String])
-     val neighborhood =  getValidatedJsonFieldValue((attributes \ "Neighborhood").validate[String])
-     Map("address" -> address, "offense" -> offense,
-       "description" -> description, "neighborhood" -> neighborhood)
-   })
+    // create a list of maps for the data
+    val entities: List[Map[String, String]] = dataItems.map(x => {
+      val attributes = (x \ "attributes")
+      val address = getValidatedJsonFieldValue(
+        (attributes \ "PublicAddress").validate[String]
+      )
+      val offense =
+        getValidatedJsonFieldValue((attributes \ "Offense").validate[String])
+      val description = getValidatedJsonFieldValue(
+        (attributes \ "Description").validate[String]
+      )
+      val neighborhood = getValidatedJsonFieldValue(
+        (attributes \ "Neighborhood").validate[String]
+      )
+      Map(
+        "address" -> address,
+        "offense" -> offense,
+        "description" -> description,
+        "neighborhood" -> neighborhood
+      )
+    })
+
+    val vec: Vector[Map[String, String]] = entities.toVector
+    addLine("converted list to vector using .toVector", output)
+
+    val filteredVec = vec.filter(x => x.getOrElse("offense", "") == "MURDR")
+    addLine(lineSplitter, output)
+    addLine("Filtered by Murder", output)
+    addLine(lineSplitter, output)
+    filteredVec.foreach(x => addLine(formatPoliceData(x), output))
+
+    addLine(lineSplitter, output)
+    addLine("List of neighborhoods", output)
+    val hoods = vec.groupBy( x => x.getOrElse("neighborhood", ""))
+    val sortedHoods = hoods.toSeq.sortWith((first, second) => first._1 < second._1)
+    // returns a map with the neighborhood as the key and map as the value
+    sortedHoods.foreach({ x => 
+      addLine(x._1, output)
+    })
 
 
-   entities.foreach( x => {
-     val addr = s"Address: ${x.getOrElse("address", "")} "
-     val offense = s"Offense: ${x.getOrElse("offense", "")} "
-     val desc = s"Desc: ${x.getOrElse("description", "")} "
-     val neigh = s"Neighborhood: ${x.getOrElse("neighborhood", "")} "
-     addLine(addr + offense + desc + neigh, output)
-   })
+    addLine(lineSplitter, output)
+    addLine("Count of crimes per neighborhood", output)
+    sortedHoods.foreach({ x => 
+      addLine(s"${x._1}: ${x._2.size}", output)
+    })
+    addLine(lineSplitter, output)
 
-   val vec : Vector[Map[String, String]] = entities.toVector
-   addLine("converted list to vector using .toVector", output)
-   vec.foreach(x => {
-     val address = x.getOrElse("address", "") 
+    val hoodsSortedByCrimeCount = sortedHoods.sortWith((first, second) => first._2.size > second._2.size)
+    hoodsSortedByCrimeCount.foreach({ x =>
+      addLine(s"${x._1}: ${x._2.size}", output)
+    })
+    
 
-   })
-   output.toString()
 
- }
+    val sortedVec = vec.sortWith((first, second) =>
+      first.getOrElse("offense", "") < second.getOrElse("offense", "")
+    )
 
-  def testHealthData() : String = {
+    addLine(lineSplitter, output)
+    addLine("Ordered by Offense", output)
+    addLine(lineSplitter, output)
+    sortedVec.foreach(x => {
+      addLine(formatPoliceData(x), output)
+    })
+
+    output.toString()
+
+  }
+
+  def formatPoliceData(map: Map[String, String]) = {
+    val addr = s"Address: ${map.getOrElse("address", "")} "
+    val offense = s"Offense: ${map.getOrElse("offense", "")} "
+    val desc = s"Desc: ${map.getOrElse("description", "")} "
+    val neigh = s"Neighborhood: ${map.getOrElse("neighborhood", "")} "
+    offense + desc + neigh + addr
+  }
+
+  def testHealthData(): String = {
     val output = new StringBuilder()
     val healthDataUrl = "https://data.sfgov.org/resource/pyih-qa8i.json"
     //"https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Food_Inspections/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
@@ -436,13 +483,13 @@ object Cheatsheet {
       case Some(theData) => {
         //addLine(theData.toString(), output)
         val items = (theData).as[List[JsValue]]
-        items.foreach({
-          item => {
+        items.foreach({ item =>
+          {
             val bizName = (item \ "business_name").as[String]
             val vio = (item \ "violation_description").validate[String]
             val vioDescription = vio match {
               case JsSuccess(viod, _) => viod
-              case e: JsError => "No Description"
+              case e: JsError         => "No Description"
             }
             addLine(s"Name: $bizName  Violation: $vioDescription", output)
           }
@@ -453,7 +500,7 @@ object Cheatsheet {
     output.toString()
   }
 
-  def collections() : String = {
+  def collections(): String = {
     val output = new StringBuilder("")
     addLine("Collections", output)
     addLine("*************************", output)
@@ -467,7 +514,10 @@ object Cheatsheet {
   topics += new Topic("Basics", notesBasics, ListBuffer.empty[Exercise])
   topics += new Topic("OO", notesOO, ListBuffer.empty)
   topics += new Topic("Pattern Matching", notesPatterns, ListBuffer.empty)
-  topics += new Topic( "Collections", notesCollections,
-    createExercises(new Exercise("Demo", collections)) )
+  topics += new Topic(
+    "Collections",
+    notesCollections,
+    createExercises(new Exercise("Demo", collections))
+  )
 
 }

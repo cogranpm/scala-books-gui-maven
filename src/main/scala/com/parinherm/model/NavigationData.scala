@@ -112,5 +112,6 @@ object NavigationData {
   }
 
   def addLine(line: String, buffer: mutable.StringBuilder) = buffer ++= line ++= "\n"
+  val lineSplitter = "*****************************************************************"
 
 }
