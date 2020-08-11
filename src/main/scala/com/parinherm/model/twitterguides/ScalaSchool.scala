@@ -15,6 +15,12 @@ object ScalaSchool{
 
   def basicsDemo(): String = {
    val output = new StringBuilder() 
+   //anonymous function inside {}'
+   val x = {i: Int =>
+     addLine("hello world", output)
+     i * 2
+   }
+   addLine(s"${x(5)}", output)
     addLine("testing", output)
    output.toString
   }
