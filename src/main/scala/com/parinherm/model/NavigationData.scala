@@ -1,7 +1,7 @@
 package com.parinherm.model
 
 import com.parinherm.model.coursera.Cheatsheet
-import com.parinherm.model.twitterguides.EffectiveScala
+import com.parinherm.model.twitterguides.{EffectiveScala, ScalaSchool}
 import com.parinherm.ui.{BrowserTest, ReferenceDocView, TopicsView}
 import org.eclipse.swt.SWT
 import org.eclipse.swt.custom.{CTabFolder, CTabItem}
@@ -31,7 +31,9 @@ object NavigationData {
   def createTwitterGuides(parentTab: CTabFolder) = {
     val view = new TopicsView(parentTab, EffectiveScala.topics)
     val item = NavigationItem("Effective Scala", createTabHandler(parentTab, view, "Effective Scala"))
-    NavigationHeader("Twitter Guides", List(item))
+    val viewSchool = new TopicsView(parentTab, ScalaSchool.topics)
+    val school = NavigationItem("Scala School", createTabHandler(parentTab, viewSchool, "ScalaSchool"))
+    NavigationHeader("Twitter Guides", List(item, school))
   }
 
   def createBrowserHack(parentTab: CTabFolder) : NavigationHeader = {
